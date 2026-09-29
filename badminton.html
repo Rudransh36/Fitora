@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulseFit - Badminton Arena & Match Intelligence | Sports & Fitness Monitoring</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/sports.css">
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <div class="app-shell">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="brand-logo">
+          <div class="brand-icon">
+            <i class="fa-solid fa-heart-pulse"></i>
+          </div>
+          <div class="brand-text">PULSE<span>FIT</span></div>
+        </a>
+        <button class="sidebar-close-btn" aria-label="Close Sidebar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="sidebar-content">
+        <div>
+          <div class="nav-section-title">Main Menu</div>
+          <ul class="nav-list">
+            <li class="nav-item">
+              <a href="index.html">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="gym.html">
+                <i class="fa-solid fa-dumbbell"></i>
+                <span>Gym & Lift</span>
+                <span class="nav-badge">4 PRs</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="cricket.html">
+                <i class="fa-solid fa-baseball-bat-ball"></i>
+                <span>Cricket Hub</span>
+                <span class="nav-badge" style="color: var(--accent-cyan);">SR 138</span>
+              </a>
+            </li>
+            <li class="nav-item active">
+              <a href="badminton.html">
+                <i class="fa-solid fa-medal"></i>
+                <span>Badminton</span>
+                <span class="nav-badge" style="background: var(--primary-subtle); color: var(--primary);">Live</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="nav-section-title">Badminton Arena</div>
+          <ul class="nav-list">
+            <li class="nav-item">
+              <a href="#liveScorerSection">
+                <i class="fa-solid fa-chalkboard-user"></i>
+                <span>Live Match Scorer</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#shotRadarSection">
+                <i class="fa-solid fa-compass"></i>
+                <span>Shot Distribution Radar</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#badmintonHistorySection">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>Match History</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Sidebar User Card -->
+        <div class="sidebar-user-card">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="Athlete Avatar" class="sidebar-user-avatar">
+          <div class="sidebar-user-info">
+            <div class="sidebar-user-name">Alex Rivera</div>
+            <div class="sidebar-user-role">Club Singles Seed</div>
+          </div>
+          <button class="sidebar-logout-btn" title="Sign Out">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+      
+      <!-- Top Navigation Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu-toggle" aria-label="Open Navigation">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" class="search-input" placeholder="Search opponents, match scores, rallies...">
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <button class="quick-action-btn" onclick="openModal('logBadmintonModal')">
+            <i class="fa-solid fa-plus"></i>
+            <span>Log Match</span>
+          </button>
+
+          <button class="topbar-icon-btn" onclick="showToast('Next Badminton Court reservation: Sunday 10:00 AM!', 'info')" title="Alerts">
+            <i class="fa-regular fa-bell"></i>
+            <span class="notification-badge"></span>
+          </button>
+
+          <div class="user-profile-menu" onclick="window.location.href='login.html'">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="User Profile" class="user-profile-avatar">
+            <span class="user-profile-label topbar-user-name">Alex Rivera</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Page Content -->
+      <main class="page-container">
+        
+        <!-- Header -->
+        <section class="page-header">
+          <div class="page-title-group">
+            <h1>
+              <span>Badminton Arena & Intelligence</span>
+              <span class="badge badge-purple">
+                <i class="fa-solid fa-medal"></i> BWF Official Scorer
+              </span>
+            </h1>
+            <p class="page-subtitle">Live digital point scorer with BWF service court rules, smash velocity tracking, and match history.</p>
+          </div>
+
+          <div class="header-actions">
+            <button class="btn btn-outline" onclick="openModal('logBadmintonModal')">
+              <i class="fa-solid fa-plus"></i> Log Past Match
+            </button>
+            <a href="#liveScorerSection" class="btn btn-primary">
+              <i class="fa-solid fa-play"></i> Start Live Scorer
+            </a>
+          </div>
+        </section>
+
+        <!-- Live Scoreboard Hero Section -->
+        <section class="badminton-hero-grid" id="liveScorerSection">
+          
+          <!-- Interactive Live Digital Scoreboard -->
+          <div class="live-scoreboard-card">
+            
+            <div class="scoreboard-status-bar">
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <span class="badge badge-emerald" id="currentSetNum">Set 1</span>
+                <span style="font-size: 0.82rem; color: var(--text-secondary);">Best of 3 Sets • BWF Rules (First to 21)</span>
+              </div>
+              
+              <div class="game-point-alert" id="gamePointAlert">
+                GAME POINT!
+              </div>
+            </div>
+
+            <!-- Faceoff Scores -->
+            <div class="scoreboard-faceoff">
+              
+              <!-- Player 1 (Alex - You) -->
+              <div class="score-player-box serving" id="p1ScoreBox">
+                <div class="service-indicator-dot" title="Server Indicator"></div>
+                <div class="score-player-name">Alex Rivera</div>
+                <div class="court-side-label" id="courtSideP1">Serving Right Court</div>
+                <div class="score-giant-digit" id="badmP1Score">0</div>
+                <div class="score-btn-group">
+                  <button class="score-action-btn" id="p1PlusBtn" title="Add 1 Point to Alex">+</button>
+                  <button class="score-action-btn btn-minus" id="p1MinusBtn" title="Minus 1 Point">-</button>
+                </div>
+              </div>
+
+              <!-- VS Divider -->
+              <div class="scoreboard-vs-divider">
+                <div>VS</div>
+                <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.4rem;">LIVE</div>
+              </div>
+
+              <!-- Player 2 (Opponent) -->
+              <div class="score-player-box" id="p2ScoreBox">
+                <div class="service-indicator-dot" title="Server Indicator"></div>
+                <div class="score-player-name">Opponent</div>
+                <div class="court-side-label" id="courtSideP2">Receiving</div>
+                <div class="score-giant-digit" id="badmP2Score">0</div>
+                <div class="score-btn-group">
+                  <button class="score-action-btn" id="p2PlusBtn" title="Add 1 Point to Opponent">+</button>
+                  <button class="score-action-btn btn-minus" id="p2MinusBtn" title="Minus 1 Point">-</button>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Quick Action Shortcut Buttons (Smash Winner / Error / Reset) -->
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.25rem;">
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button class="btn btn-secondary btn-sm" id="logSmashBtn">
+                  <i class="fa-solid fa-bolt" style="color: var(--primary);"></i> Smash Winner (+1 Pt)
+                </button>
+                <button class="btn btn-secondary btn-sm" id="logErrorBtn">
+                  <i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-red);"></i> Unforced Error
+                </button>
+              </div>
+
+              <button class="btn btn-ghost btn-sm" id="resetScoreboardBtn">
+                <i class="fa-solid fa-rotate-left"></i> Reset Match
+              </button>
+            </div>
+
+            <!-- Sets History Summary Row -->
+            <div class="sets-summary-bar" id="badmSetsHistory">
+              <span class="set-chip">Set 1: In Progress</span>
+            </div>
+
+          </div>
+
+          <!-- Court Visual & Rules Guide Box -->
+          <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div class="card-header" style="margin-bottom: 0.75rem;">
+                <h3 class="card-title">
+                  <i class="fa-solid fa-table-cells" style="color: var(--primary);"></i> Court Rules & Parity
+                </h3>
+                <span class="badge badge-outline">Singles Court</span>
+              </div>
+              <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                Server delivers diagonal cross-court. When server score is <strong>Even</strong> (0, 2, 4...), service is from <strong>Right</strong>. When <strong>Odd</strong> (1, 3, 5...), service is from <strong>Left</strong>.
+              </p>
+
+              <!-- Stylized Court Graphic -->
+              <div class="court-diagram-container">
+                <div class="court-half">
+                  <div class="court-service-line"></div>
+                  <div class="court-center-line"></div>
+                  <div style="position: absolute; bottom: 8px; left: 10px; font-size: 0.68rem; color: rgba(255,255,255,0.7); font-weight: 700;">Left Box (Odd)</div>
+                  <div style="position: absolute; top: 8px; left: 10px; font-size: 0.68rem; color: rgba(255,255,255,0.7); font-weight: 700;">Right Box (Even)</div>
+                </div>
+                <div class="court-net"></div>
+                <div class="court-half">
+                  <div class="court-service-line"></div>
+                  <div class="court-center-line"></div>
+                  <div style="position: absolute; top: 8px; right: 10px; font-size: 0.68rem; color: rgba(255,255,255,0.7); font-weight: 700;">Left Box (Odd)</div>
+                  <div style="position: absolute; bottom: 8px; right: 10px; font-size: 0.68rem; color: rgba(255,255,255,0.7); font-weight: 700;">Right Box (Even)</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; font-size: 0.82rem;">
+              <span>Current Server Status:</span>
+              <strong style="color: var(--primary);">Auto-Tracked by Point</strong>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- Season Performance Metrics Strip -->
+        <section class="cricket-stat-strip" style="margin-bottom: 2rem;">
+          
+          <div class="card stat-card" style="--stat-glow: rgba(0, 245, 155, 0.2);">
+            <div class="stat-card-header">
+              <div class="stat-icon-wrapper stat-icon-emerald">
+                <i class="fa-solid fa-trophy"></i>
+              </div>
+              <span class="badge badge-emerald">68% Win Rate</span>
+            </div>
+            <div class="stat-value">42 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 500;">Matches</span></div>
+            <div class="stat-label">Season Match Record</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">
+              29 Wins • 13 Losses (Singles & Doubles)
+            </div>
+          </div>
+
+          <div class="card stat-card" style="--stat-glow: rgba(0, 210, 255, 0.2);">
+            <div class="stat-card-header">
+              <div class="stat-icon-wrapper stat-icon-cyan">
+                <i class="fa-solid fa-bolt"></i>
+              </div>
+              <span class="stat-trend up">265 km/h Peak</span>
+            </div>
+            <div class="stat-value">384 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 500;">Smashes</span></div>
+            <div class="stat-label">Attacking Shot Velocity</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">
+              Avg 14.2 winners per match
+            </div>
+          </div>
+
+          <div class="card stat-card" style="--stat-glow: rgba(255, 159, 26, 0.2);">
+            <div class="stat-card-header">
+              <div class="stat-icon-wrapper stat-icon-orange">
+                <i class="fa-solid fa-shuffle"></i>
+              </div>
+              <span class="badge badge-orange">Longest: 42 shots</span>
+            </div>
+            <div class="stat-value">8.4 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 500;">Shots</span></div>
+            <div class="stat-label">Average Rally Length</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">
+              3.2 km court coverage per hour
+            </div>
+          </div>
+
+          <div class="card stat-card" style="--stat-glow: rgba(168, 85, 247, 0.2);">
+            <div class="stat-card-header">
+              <div class="stat-icon-wrapper stat-icon-purple">
+                <i class="fa-solid fa-fire"></i>
+              </div>
+              <span class="badge badge-purple">Zone 4 Peak</span>
+            </div>
+            <div class="stat-value">580 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 500;">kcal</span></div>
+            <div class="stat-label">Avg Match Calorie Burn</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">
+              Max Heart Rate: 178 bpm
+            </div>
+          </div>
+
+        </section>
+
+        <!-- Technical Shot Radar & Match History Grid -->
+        <section class="grid-layout-split" style="margin-bottom: 2rem;">
+          
+          <!-- Shot Distribution Radar -->
+          <div class="card" id="shotRadarSection">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">
+                  <i class="fa-solid fa-chart-pie" style="color: var(--accent-cyan);"></i> Tactical Shot Mastery Radar
+                </h3>
+                <p class="card-subtitle">Execution frequency and win percentage per shot style</p>
+              </div>
+            </div>
+            <div style="height: 320px; width: 100%;">
+              <canvas id="badmintonShotRadarChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Match History Section -->
+          <div id="badmintonHistorySection">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+              <h3 style="font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-clock-rotate-left" style="color: var(--primary);"></i>
+                <span>Match History Logs</span>
+              </h3>
+
+              <!-- Filter Buttons -->
+              <div style="display: flex; gap: 0.35rem; background: var(--bg-card); padding: 0.35rem; border-radius: var(--radius-full); border: 1px solid var(--border-subtle);">
+                <button class="btn btn-sm btn-primary badminton-filter-btn active" data-filter="all">All</button>
+                <button class="btn btn-sm btn-ghost badminton-filter-btn" data-filter="win">Wins</button>
+                <button class="btn btn-sm btn-ghost badminton-filter-btn" data-filter="loss">Losses</button>
+              </div>
+            </div>
+
+            <!-- Dynamic match list container -->
+            <div id="badmintonHistoryList">
+              <!-- Dynamically populated from localStorage via badminton.js -->
+            </div>
+          </div>
+
+        </section>
+
+      </main>
+
+    </div>
+
+    <!-- Mobile Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+      <a href="index.html" class="bottom-nav-item">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="gym.html" class="bottom-nav-item">
+        <i class="fa-solid fa-dumbbell"></i>
+        <span>Gym</span>
+      </a>
+      <a href="cricket.html" class="bottom-nav-item">
+        <i class="fa-solid fa-baseball-bat-ball"></i>
+        <span>Cricket</span>
+      </a>
+      <a href="badminton.html" class="bottom-nav-item active">
+        <i class="fa-solid fa-medal"></i>
+        <span>Badminton</span>
+      </a>
+      <a href="login.html" class="bottom-nav-item">
+        <i class="fa-solid fa-user"></i>
+        <span>Profile</span>
+      </a>
+    </nav>
+
+  </div>
+
+  <!-- Log Past Badminton Match Modal -->
+  <div class="modal-overlay" id="logBadmintonModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-medal" style="color: var(--accent-purple);"></i>
+          <span>Log Past Badminton Match</span>
+        </div>
+        <button class="modal-close-btn" data-close-modal>
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="logPastBadmintonForm">
+        <div class="modal-body">
+          <div class="grid-2" style="gap: 1rem; margin-bottom: 0;">
+            <div class="form-group">
+              <label class="form-label" for="badmOpponent">Opponent Player / Pair</label>
+              <input type="text" id="badmOpponent" class="form-control" placeholder="e.g. Marcus Vance or Chen / Lin" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="badmMode">Mode</label>
+              <select id="badmMode" class="form-control" required>
+                <option value="Singles">Men's Singles</option>
+                <option value="Doubles">Men's Doubles</option>
+                <option value="Mixed Doubles">Mixed Doubles</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid-2" style="gap: 1rem; margin-bottom: 0;">
+            <div class="form-group">
+              <label class="form-label" for="badmScore">Set Scores</label>
+              <input type="text" id="badmScore" class="form-control" placeholder="e.g. 21-17, 19-21, 21-15" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="badmResult">Result</label>
+              <select id="badmResult" class="form-control" required>
+                <option value="Win">Win</option>
+                <option value="Loss">Loss</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid-3" style="gap: 0.75rem; margin-bottom: 0;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="badmDuration">Duration</label>
+              <input type="text" id="badmDuration" class="form-control" placeholder="e.g. 48m" value="45m">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="badmSmashes">Smashes</label>
+              <input type="number" id="badmSmashes" class="form-control" value="16" min="0">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="badmErrors">Errors</label>
+              <input type="number" id="badmErrors" class="form-control" value="7" min="0">
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal>Cancel</button>
+          <button type="submit" class="btn btn-primary">Save to History</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/app.js"></script>
+  <script src="js/badminton.js"></script>
+</body>
+</html>

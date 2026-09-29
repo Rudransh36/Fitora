@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulseFit - Gym & Strength Training | Sports & Fitness Monitoring</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/sports.css">
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <div class="app-shell">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="brand-logo">
+          <div class="brand-icon">
+            <i class="fa-solid fa-heart-pulse"></i>
+          </div>
+          <div class="brand-text">PULSE<span>FIT</span></div>
+        </a>
+        <button class="sidebar-close-btn" aria-label="Close Sidebar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="sidebar-content">
+        <div>
+          <div class="nav-section-title">Main Menu</div>
+          <ul class="nav-list">
+            <li class="nav-item">
+              <a href="index.html">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li class="nav-item active">
+              <a href="gym.html">
+                <i class="fa-solid fa-dumbbell"></i>
+                <span>Gym & Lift</span>
+                <span class="nav-badge" style="background: var(--primary-subtle); color: var(--primary);">Active</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="cricket.html">
+                <i class="fa-solid fa-baseball-bat-ball"></i>
+                <span>Cricket Hub</span>
+                <span class="nav-badge" style="color: var(--accent-cyan);">SR 138</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="badminton.html">
+                <i class="fa-solid fa-medal"></i>
+                <span>Badminton</span>
+                <span class="nav-badge" style="color: var(--primary);">Live</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="nav-section-title">Gym Tools</div>
+          <ul class="nav-list">
+            <li class="nav-item">
+              <a href="#restTimerSection">
+                <i class="fa-solid fa-stopwatch"></i>
+                <span>Rest Interval Timer</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#oneRmSection">
+                <i class="fa-solid fa-calculator"></i>
+                <span>1RM Estimator</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#prShowcaseSection">
+                <i class="fa-solid fa-award"></i>
+                <span>Personal Records</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Sidebar User Card -->
+        <div class="sidebar-user-card">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="Athlete Avatar" class="sidebar-user-avatar">
+          <div class="sidebar-user-info">
+            <div class="sidebar-user-name">Alex Rivera</div>
+            <div class="sidebar-user-role">Advanced Athlete</div>
+          </div>
+          <button class="sidebar-logout-btn" title="Sign Out">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+      
+      <!-- Top Navigation Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu-toggle" aria-label="Open Navigation">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" class="search-input" placeholder="Search exercises, PRs, routines...">
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <button class="quick-action-btn" onclick="openModal('addExerciseModal')">
+            <i class="fa-solid fa-plus"></i>
+            <span>Add Exercise</span>
+          </button>
+
+          <button class="topbar-icon-btn" onclick="showToast('Workout in progress: 48 mins elapsed.', 'info')" title="Session Info">
+            <i class="fa-regular fa-bell"></i>
+            <span class="notification-badge"></span>
+          </button>
+
+          <div class="user-profile-menu" onclick="window.location.href='login.html'">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="User Profile" class="user-profile-avatar">
+            <span class="user-profile-label topbar-user-name">Alex Rivera</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Page Content -->
+      <main class="page-container">
+        
+        <!-- Header -->
+        <section class="page-header">
+          <div class="page-title-group">
+            <h1>
+              <span>Gym & Strength Tracking</span>
+              <span class="badge badge-emerald">
+                <i class="fa-solid fa-bolt"></i> Progressive Overload
+              </span>
+            </h1>
+            <p class="page-subtitle">Track sets, weights, repetitions, rest periods, and compute estimated 1-rep maximums.</p>
+          </div>
+
+          <div class="header-actions">
+            <button class="btn btn-outline" onclick="openModal('addExerciseModal')">
+              <i class="fa-solid fa-plus"></i> Add Exercise
+            </button>
+            <button class="btn btn-primary" onclick="showToast('Workout completed & logged to history! Volume: 6,480 kg', 'success', 'Session Finished')">
+              <i class="fa-solid fa-check-double"></i> Finish Workout
+            </button>
+          </div>
+        </section>
+
+        <!-- Current Session Live Status Banner -->
+        <section class="gym-header-banner">
+          <div>
+            <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--primary); font-weight: 700; margin-bottom: 0.4rem;">
+              Current Active Routine
+            </div>
+            <h2 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 0.4rem;">
+              Push Day (Chest, Shoulders & Triceps)
+            </h2>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">
+              Focus: Heavy compound pressing followed by tricep isolation.
+            </p>
+          </div>
+
+          <div style="display: flex; gap: 2rem; align-items: center; flex-wrap: wrap;">
+            <div>
+              <span style="font-size: 0.75rem; color: var(--text-muted); display: block; text-transform: uppercase;">Total Volume Lifted</span>
+              <strong id="totalSessionVolume" style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">6,480 kg</strong>
+            </div>
+            <div>
+              <span style="font-size: 0.75rem; color: var(--text-muted); display: block; text-transform: uppercase;">Active Duration</span>
+              <strong style="font-size: 1.5rem; font-weight: 800; color: var(--accent-cyan);">48 mins</strong>
+            </div>
+            <div>
+              <span style="font-size: 0.75rem; color: var(--text-muted); display: block; text-transform: uppercase;">Completed Sets</span>
+              <strong style="font-size: 1.5rem; font-weight: 800; color: #fff;">10 / 14</strong>
+            </div>
+          </div>
+        </section>
+
+        <!-- Workout Routine Split Filters -->
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 0.5rem;">
+          <button class="btn btn-sm btn-primary routine-select-pill active" data-routine="Push (Chest/Tri)">Push Day (Chest & Shoulders)</button>
+          <button class="btn btn-sm btn-secondary routine-select-pill" data-routine="Pull (Back/Bi)">Pull Day (Back & Biceps)</button>
+          <button class="btn btn-sm btn-secondary routine-select-pill" data-routine="Legs (Quads/Hamstrings)">Legs & Core</button>
+          <button class="btn btn-sm btn-secondary routine-select-pill" data-routine="Upper Hypertrophy">Upper Hypertrophy</button>
+        </div>
+
+        <!-- Two Column Interactive Tools Row: Rest Timer & 1RM Calculator -->
+        <section class="grid-2" style="margin-bottom: 2rem;">
+          
+          <!-- Tool 1: Digital Rest Timer Widget -->
+          <div class="rest-timer-widget" id="restTimerSection">
+            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 0.5rem;">
+              <h3 style="font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-stopwatch" style="color: var(--primary);"></i> Rest Interval Timer
+              </h3>
+              <span class="badge badge-emerald">Audio Chime On</span>
+            </div>
+
+            <!-- Presets -->
+            <div class="timer-preset-btns">
+              <button class="timer-preset-btn" data-seconds="30">30s</button>
+              <button class="timer-preset-btn active" data-seconds="60">60s</button>
+              <button class="timer-preset-btn" data-seconds="90">90s</button>
+              <button class="timer-preset-btn" data-seconds="120">120s</button>
+            </div>
+
+            <!-- Circular Timer Graphic -->
+            <div class="timer-circle-container">
+              <svg class="timer-svg" viewBox="0 0 160 160">
+                <circle class="timer-track-circle" cx="80" cy="80" r="70" />
+                <circle class="timer-progress-circle" cx="80" cy="80" r="70" />
+              </svg>
+              <div class="timer-time-display" id="timerDisplay">01:00</div>
+            </div>
+
+            <!-- Controls -->
+            <div style="display: flex; gap: 0.75rem;">
+              <button class="btn btn-primary btn-sm" id="timerPlayBtn">
+                <i class="fa-solid fa-play"></i> Start
+              </button>
+              <button class="btn btn-secondary btn-sm" id="timerResetBtn">
+                <i class="fa-solid fa-rotate-left"></i> Reset
+              </button>
+            </div>
+          </div>
+
+          <!-- Tool 2: 1RM (One Rep Max) Calculator -->
+          <div class="onerm-calculator-box" id="oneRmSection">
+            <div class="card-header" style="margin-bottom: 0.75rem;">
+              <h3 class="card-title">
+                <i class="fa-solid fa-calculator" style="color: var(--accent-cyan);"></i>
+                <span>1RM Weight Calculator</span>
+              </h3>
+              <span class="badge badge-cyan">Epley Formula</span>
+            </div>
+            <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1rem;">
+              Enter your lifted load and reps completed to compute your estimated maximum strength.
+            </p>
+
+            <div class="grid-2" style="gap: 0.75rem; margin-bottom: 0.5rem;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Weight Lifted (kg)</label>
+                <input type="number" id="calcWeight" class="form-control" value="100" min="1" max="500">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Reps Completed</label>
+                <input type="number" id="calcReps" class="form-control" value="5" min="1" max="15">
+              </div>
+            </div>
+
+            <!-- Computed 1RM Display -->
+            <div class="onerm-result-display">
+              <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Estimated 1 Rep Max</div>
+              <div class="onerm-result-number" id="calc1RmVal">117 kg</div>
+              
+              <div class="onerm-subtable">
+                <div class="onerm-tier">
+                  <div class="onerm-tier-label">90% (3 Reps)</div>
+                  <div class="onerm-tier-val" id="tier90">105 kg</div>
+                </div>
+                <div class="onerm-tier">
+                  <div class="onerm-tier-label">80% (8 Reps)</div>
+                  <div class="onerm-tier-val" id="tier80">94 kg</div>
+                </div>
+                <div class="onerm-tier">
+                  <div class="onerm-tier-label">70% (12 Reps)</div>
+                  <div class="onerm-tier-val" id="tier70">82 kg</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- Active Exercise Set Tracking Stream -->
+        <section style="margin-bottom: 2rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+            <h2 style="font-size: 1.35rem; font-weight: 800; display: flex; align-items: center; gap: 0.6rem;">
+              <i class="fa-solid fa-list-check" style="color: var(--primary);"></i>
+              <span>Current Session Exercises</span>
+            </h2>
+            <button class="btn btn-sm btn-primary" onclick="openModal('addExerciseModal')">
+              <i class="fa-solid fa-plus"></i> Add New Exercise
+            </button>
+          </div>
+
+          <div id="exerciseCardsContainer">
+            
+            <!-- Exercise 1: Bench Press -->
+            <div class="exercise-card">
+              <div class="exercise-header">
+                <div class="exercise-title-area">
+                  <h3 style="font-size: 1.15rem; font-weight: 700;">Barbell Flat Bench Press</h3>
+                  <span class="muscle-badge muscle-chest">Chest</span>
+                </div>
+                <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                  Personal Record: <strong style="color: var(--primary);">110 kg</strong> (1RM)
+                </div>
+              </div>
+
+              <div class="table-responsive">
+                <table class="set-table">
+                  <thead>
+                    <tr>
+                      <th>Set</th>
+                      <th>Target</th>
+                      <th>Weight</th>
+                      <th>Reps</th>
+                      <th>Done</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>1</strong></td>
+                      <td style="color: var(--text-muted); font-size: 0.85rem;">Warmup</td>
+                      <td><input type="number" class="set-input set-weight" value="60" step="2.5"> kg</td>
+                      <td><input type="number" class="set-input set-reps" value="12" step="1"></td>
+                      <td>
+                        <button class="set-check-btn completed" title="Mark Set Done">
+                          <i class="fa-solid fa-check"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>2</strong></td>
+                      <td style="color: var(--text-muted); font-size: 0.85rem;">85 kg x 8</td>
+                      <td><input type="number" class="set-input set-weight" value="85" step="2.5"> kg</td>
+                      <td><input type="number" class="set-input set-reps" value="8" step="1"></td>
+                      <td>
+                        <button class="set-check-btn completed" title="Mark Set Done">
+                          <i class="fa-solid fa-check"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>3</strong></td>
+                      <td style="color: var(--text-muted); font-size: 0.85rem;">95 kg x 6</td>
+                      <td><input type="number" class="set-input set-weight" value="95" step="2.5"> kg</td>
+                      <td><input type="number" class="set-input set-reps" value="6" step="1"></td>
+                      <td>
+                        <button class="set-check-btn completed" title="Mark Set Done">
+                          <i class="fa-solid fa-check"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>4</strong></td>
+                      <td style="color: var(--text-muted); font-size: 0.85rem;">102.5 kg x 4</td>
+                      <td><input type="number" class="set-input set-weight" value="102.5" step="2.5"> kg</td>
+                      <td><input type="number" class="set-input set-reps" value="4" step="1"></td>
+                      <td>
+                        <button class="set-check-btn" title="Mark Set Done">
+                          <i class="fa-regular fa-circle"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                <button class="btn btn-secondary btn-sm btn-add-set">
+                  <i class="fa-solid fa-plus"></i> Add Set
+                </button>
+                <span style="font-size: 0.8rem; color: var(--text-muted);">Recommended rest: 120s between heavy compound sets</span>
+              </div>
+            </div>
+
+            <!-- Exercise 2: Standing Overhead Press -->
+            <div class="exercise-card">
+              <div class="exercise-header">
+                <div class="exercise-title-area">
+                  <h3 style="font-size: 1.15rem; font-weight: 700;">Standing Military Overhead Press</h3>
+                  <span class="muscle-badge muscle-shoulders">Shoulders</span>
+                </div>
+                <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                  Personal Record: <strong style="color: var(--primary);">75 kg</strong>
+                </div>
+              </div>
+
+              <div class="table-responsive">
+                <table class="set-table">
+                  <thead>
+                    <tr>
+                      <th>Set</th>
+                      <th>Target</th>
+                      <th>Weight</th>
+                      <th>Reps</th>
+                      <th>Done</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>1</strong></td>
+                      <td style="color: var(--text-muted); font-size: 0.85rem;">50 kg x 10</td>
+                      <td><input type="number" class="set-input set-weight" value="50" step="2.5"> kg</td>
+                      <td><input type="number" class="set-input set-reps" value="10" step="1"></td>
+                      <td>
+                        <button class="set-check-btn completed" title="Mark Set Done">
+                          <i class="fa-solid fa-check"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>2</strong></td>
+                      <td style="color: var(--text-muted); font-size: 0.85rem;">60 kg x 8</td>
+                      <td><input type="number" class="set-input set-weight" value="60" step="2.5"> kg</td>
+                      <td><input type="number" class="set-input set-reps" value="8" step="1"></td>
+                      <td>
+                        <button class="set-check-btn" title="Mark Set Done">
+                          <i class="fa-regular fa-circle"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>3</strong></td>
+                      <td style="color: var(--text-muted); font-size: 0.85rem;">65 kg x 6</td>
+                      <td><input type="number" class="set-input set-weight" value="65" step="2.5"> kg</td>
+                      <td><input type="number" class="set-input set-reps" value="6" step="1"></td>
+                      <td>
+                        <button class="set-check-btn" title="Mark Set Done">
+                          <i class="fa-regular fa-circle"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                <button class="btn btn-secondary btn-sm btn-add-set">
+                  <i class="fa-solid fa-plus"></i> Add Set
+                </button>
+                <span style="font-size: 0.8rem; color: var(--text-muted);">Recommended rest: 90s</span>
+              </div>
+            </div>
+
+            <!-- Exercise 3: Incline Dumbbell Press -->
+            <div class="exercise-card">
+              <div class="exercise-header">
+                <div class="exercise-title-area">
+                  <h3 style="font-size: 1.15rem; font-weight: 700;">Incline Dumbbell Press (30° Angle)</h3>
+                  <span class="muscle-badge muscle-chest">Upper Chest</span>
+                </div>
+                <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                  Personal Record: <strong style="color: var(--primary);">38 kg DBs</strong>
+                </div>
+              </div>
+
+              <div class="table-responsive">
+                <table class="set-table">
+                  <thead>
+                    <tr>
+                      <th>Set</th>
+                      <th>Target</th>
+                      <th>Weight</th>
+                      <th>Reps</th>
+                      <th>Done</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>1</strong></td>
+                      <td style="color: var(--text-muted); font-size: 0.85rem;">30 kg x 10</td>
+                      <td><input type="number" class="set-input set-weight" value="30" step="2"> kg</td>
+                      <td><input type="number" class="set-input set-reps" value="10" step="1"></td>
+                      <td>
+                        <button class="set-check-btn completed" title="Mark Set Done">
+                          <i class="fa-solid fa-check"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>2</strong></td>
+                      <td style="color: var(--text-muted); font-size: 0.85rem;">34 kg x 8</td>
+                      <td><input type="number" class="set-input set-weight" value="34" step="2"> kg</td>
+                      <td><input type="number" class="set-input set-reps" value="8" step="1"></td>
+                      <td>
+                        <button class="set-check-btn" title="Mark Set Done">
+                          <i class="fa-regular fa-circle"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                <button class="btn btn-secondary btn-sm btn-add-set">
+                  <i class="fa-solid fa-plus"></i> Add Set
+                </button>
+                <span style="font-size: 0.8rem; color: var(--text-muted);">Recommended rest: 90s</span>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Personal Records (PR) Grid & Radar Balance Chart -->
+        <section class="grid-layout-split" style="margin-bottom: 2rem;">
+          
+          <!-- PR Showcase -->
+          <div id="prShowcaseSection">
+            <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+              <i class="fa-solid fa-trophy" style="color: var(--accent-orange);"></i>
+              <span>All-Time Personal Records (PR)</span>
+            </h3>
+
+            <div class="grid-2" style="gap: 1rem;">
+              <div class="card" style="padding: 1.15rem;">
+                <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Flat Bench Press</span>
+                <div style="font-size: 1.6rem; font-weight: 800; color: var(--primary); margin: 0.2rem 0;">110 kg</div>
+                <div style="font-size: 0.78rem; color: var(--primary);">⭐ +5kg this month</div>
+              </div>
+
+              <div class="card" style="padding: 1.15rem;">
+                <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Barbell Back Squat</span>
+                <div style="font-size: 1.6rem; font-weight: 800; color: var(--accent-cyan); margin: 0.2rem 0;">145 kg</div>
+                <div style="font-size: 0.78rem; color: var(--text-secondary);">Last set: 5 reps</div>
+              </div>
+
+              <div class="card" style="padding: 1.15rem;">
+                <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Conventional Deadlift</span>
+                <div style="font-size: 1.6rem; font-weight: 800; color: var(--accent-orange); margin: 0.2rem 0;">180 kg</div>
+                <div style="font-size: 0.78rem; color: var(--text-secondary);">Double bodyweight</div>
+              </div>
+
+              <div class="card" style="padding: 1.15rem;">
+                <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Weighted Pull-Up</span>
+                <div style="font-size: 1.6rem; font-weight: 800; color: var(--accent-purple); margin: 0.2rem 0;">+25 kg</div>
+                <div style="font-size: 0.78rem; color: var(--text-secondary);">Strict form 5 reps</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Radar Balance Chart -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">
+                  <i class="fa-solid fa-compass" style="color: var(--primary);"></i> Muscle Volume Radar
+                </h3>
+                <p class="card-subtitle">Weekly sets per target muscle group</p>
+              </div>
+            </div>
+            <div style="height: 270px; width: 100%;">
+              <canvas id="gymVolumeChart"></canvas>
+            </div>
+          </div>
+
+        </section>
+
+      </main>
+
+    </div>
+
+    <!-- Mobile Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+      <a href="index.html" class="bottom-nav-item">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="gym.html" class="bottom-nav-item active">
+        <i class="fa-solid fa-dumbbell"></i>
+        <span>Gym</span>
+      </a>
+      <a href="cricket.html" class="bottom-nav-item">
+        <i class="fa-solid fa-baseball-bat-ball"></i>
+        <span>Cricket</span>
+      </a>
+      <a href="badminton.html" class="bottom-nav-item">
+        <i class="fa-solid fa-medal"></i>
+        <span>Badminton</span>
+      </a>
+      <a href="login.html" class="bottom-nav-item">
+        <i class="fa-solid fa-user"></i>
+        <span>Profile</span>
+      </a>
+    </nav>
+
+  </div>
+
+  <!-- Add Exercise Modal -->
+  <div class="modal-overlay" id="addExerciseModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-plus-circle" style="color: var(--primary);"></i> Add Custom Exercise
+        </div>
+        <button class="modal-close-btn" data-close-modal>
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="addExerciseForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="exNameInput">Exercise Name</label>
+            <input type="text" id="exNameInput" class="form-control" placeholder="e.g. Incline Cable Flyes or Bulgarian Split Squat" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="exMuscleSelect">Target Muscle Group</label>
+            <select id="exMuscleSelect" class="form-control" required>
+              <option value="Chest">Chest</option>
+              <option value="Back">Back (Lats & Rhomboids)</option>
+              <option value="Legs">Legs (Quads / Glutes / Hamstrings)</option>
+              <option value="Shoulders">Shoulders (Deltoids)</option>
+              <option value="Arms">Arms (Biceps & Triceps)</option>
+              <option value="Core">Core & Abs</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal>Cancel</button>
+          <button type="submit" class="btn btn-primary">Add to Current Session</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/app.js"></script>
+  <script src="js/gym.js"></script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulseFit - Athlete Sign In | Sports & Fitness Monitoring</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/sports.css">
+</head>
+<body class="auth-page">
+
+  <div class="auth-card-container">
+    <!-- Left Showcase Panel (Desktop) -->
+    <div class="auth-showcase-panel">
+      <div>
+        <div class="showcase-badge">
+          <i class="fa-solid fa-bolt"></i> Ultimate Sports Intelligence
+        </div>
+        
+        <div class="brand-logo" style="margin-bottom: 2rem;">
+          <div class="brand-icon">
+            <i class="fa-solid fa-heart-pulse"></i>
+          </div>
+          <div class="brand-text">PULSE<span>FIT</span></div>
+        </div>
+
+        <h1 class="showcase-title">
+          Elevate Your Game Across <span>Gym, Cricket</span> & <span>Badminton</span>.
+        </h1>
+        
+        <p class="showcase-desc">
+          Seamlessly monitor barbell progressive overload, cricket match strike rates, bowling figures, and live badminton court rallies in one unified dashboard.
+        </p>
+      </div>
+
+      <div class="showcase-metrics">
+        <div class="showcase-metric-item">
+          <h4>25k+</h4>
+          <p>Active Athletes</p>
+        </div>
+        <div class="showcase-metric-item">
+          <h4>1.2M</h4>
+          <p>Sets Logged</p>
+        </div>
+        <div class="showcase-metric-item">
+          <h4>99.4%</h4>
+          <p>Goal Accuracy</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Form Panel -->
+    <div class="auth-form-panel">
+      <div class="auth-header">
+        <div class="brand-logo" style="margin-bottom: 1.5rem; display: none;" id="mobileAuthLogo">
+          <div class="brand-icon">
+            <i class="fa-solid fa-heart-pulse"></i>
+          </div>
+          <div class="brand-text">PULSE<span>FIT</span></div>
+        </div>
+        <h2>Welcome Back</h2>
+        <p>New to PulseFit? <a href="register.html">Create an athlete account</a></p>
+      </div>
+
+      <!-- Quick 1-Click Demo Login Helper -->
+      <div class="demo-account-box">
+        <div class="demo-account-text">
+          <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary); margin-right: 0.35rem;"></i>
+          Demo: <strong>alex@pulsefit.io</strong>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" id="fillDemoCredsBtn">
+          1-Click Autofill
+        </button>
+      </div>
+
+      <!-- Social Logins -->
+      <div class="social-login-grid">
+        <button type="button" class="social-btn" onclick="simulateSocialLogin('Google')">
+          <i class="fa-brands fa-google" style="color: #ea4335;"></i> Google
+        </button>
+        <button type="button" class="social-btn" onclick="simulateSocialLogin('Apple')">
+          <i class="fa-brands fa-apple"></i> Apple
+        </button>
+      </div>
+
+      <div class="auth-divider">Or continue with email</div>
+
+      <!-- Login Form -->
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="form-label" for="loginEmail">Email or Username</label>
+          <div class="input-wrapper">
+            <i class="fa-regular fa-envelope input-icon-left"></i>
+            <input type="text" id="loginEmail" class="form-control has-icon-left" placeholder="e.g. alex@pulsefit.io" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem;">
+            <label class="form-label" for="loginPassword" style="margin-bottom: 0;">Password</label>
+            <a href="javascript:void(0)" onclick="openModal('forgotPasswordModal')" style="font-size: 0.8rem; color: var(--primary);">Forgot password?</a>
+          </div>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-lock input-icon-left"></i>
+            <input type="password" id="loginPassword" class="form-control has-icon-left has-action-right" placeholder="••••••••" required>
+            <button type="button" class="input-action-right" id="togglePasswordBtn">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+          <label class="form-check">
+            <input type="checkbox" id="rememberMeCheck" checked>
+            <span class="form-check-label">Keep me logged in</span>
+          </label>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg btn-full" id="signInSubmitBtn">
+          <span>Sign In to Dashboard</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div class="modal-overlay" id="forgotPasswordModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-key" style="color: var(--primary);"></i> Reset Password
+        </div>
+        <button class="modal-close-btn" data-close-modal>
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="forgotPasswordForm">
+        <div class="modal-body">
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.25rem;">
+            Enter your registered email address and we'll send you an instant reset link and verification code.
+          </p>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" class="form-control" placeholder="alex@pulsefit.io" required id="forgotEmail">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal>Cancel</button>
+          <button type="submit" class="btn btn-primary">Send Reset Link</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/app.js"></script>
+  <script>
+    // Show mobile logo if screen is small
+    if (window.innerWidth <= 900) {
+      const mobileLogo = document.getElementById("mobileAuthLogo");
+      if (mobileLogo) mobileLogo.style.display = "flex";
+    }
+
+    // Toggle Password Visibility
+    const toggleBtn = document.getElementById("togglePasswordBtn");
+    const pwdInput = document.getElementById("loginPassword");
+    toggleBtn.addEventListener("click", () => {
+      const isPassword = pwdInput.type === "password";
+      pwdInput.type = isPassword ? "text" : "password";
+      toggleBtn.innerHTML = isPassword ? '<i class="fa-regular fa-eye-slash"></i>' : '<i class="fa-regular fa-eye"></i>';
+    });
+
+    // 1-Click Demo Credentials
+    document.getElementById("fillDemoCredsBtn").addEventListener("click", () => {
+      document.getElementById("loginEmail").value = "alex@pulsefit.io";
+      document.getElementById("loginPassword").value = "athlete123";
+      showToast("Demo athlete credentials filled!", "info");
+    });
+
+    // Form Submit
+    document.getElementById("loginForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("loginEmail").value;
+      const btn = document.getElementById("signInSubmitBtn");
+      
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...';
+      btn.disabled = true;
+
+      setTimeout(() => {
+        showToast("Welcome back, Alex! Redirecting to your fitness hub...", "success");
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 800);
+      }, 700);
+    });
+
+    function simulateSocialLogin(provider) {
+      showToast(`Signing in with ${provider}...`, "info");
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 900);
+    }
+
+    // Forgot password handler
+    document.getElementById("forgotPasswordForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("forgotEmail").value;
+      closeModal("forgotPasswordModal");
+      showToast(`Password reset link dispatched to ${email}`, "success", "Check Your Inbox");
+    });
+  </script>
+</body>
+</html>

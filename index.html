@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulseFit - Athlete Dashboard | Sports & Fitness Monitoring</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/sports.css">
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <div class="app-shell">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="brand-logo">
+          <div class="brand-icon">
+            <i class="fa-solid fa-heart-pulse"></i>
+          </div>
+          <div class="brand-text">PULSE<span>FIT</span></div>
+        </a>
+        <button class="sidebar-close-btn" aria-label="Close Sidebar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="sidebar-content">
+        <div>
+          <div class="nav-section-title">Main Menu</div>
+          <ul class="nav-list">
+            <li class="nav-item active">
+              <a href="index.html">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="gym.html">
+                <i class="fa-solid fa-dumbbell"></i>
+                <span>Gym & Lift</span>
+                <span class="nav-badge">4 PRs</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="cricket.html">
+                <i class="fa-solid fa-baseball-bat-ball"></i>
+                <span>Cricket Hub</span>
+                <span class="nav-badge" style="color: var(--accent-cyan);">SR 138</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="badminton.html">
+                <i class="fa-solid fa-medal"></i>
+                <span>Badminton</span>
+                <span class="nav-badge" style="color: var(--primary);">Live</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="nav-section-title">Athlete Insights</div>
+          <ul class="nav-list">
+            <li class="nav-item">
+              <a href="javascript:void(0)" onclick="showToast('Analytics & Reports view is integrated into individual sport hubs!', 'info')">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Biometrics & Heart</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="javascript:void(0)" onclick="showToast('You have 8 active badges unlocked!', 'info')">
+                <i class="fa-solid fa-award"></i>
+                <span>Milestones & Streak</span>
+                <span class="nav-badge" style="background: rgba(255,159,26,0.15); color: var(--accent-orange);">🔥 14d</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Sidebar User Footer Card -->
+        <div class="sidebar-user-card">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="Athlete Avatar" class="sidebar-user-avatar">
+          <div class="sidebar-user-info">
+            <div class="sidebar-user-name">Alex Rivera</div>
+            <div class="sidebar-user-role">Advanced Athlete</div>
+          </div>
+          <button class="sidebar-logout-btn" title="Sign Out">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+      
+      <!-- Top Navigation Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu-toggle" aria-label="Open Navigation">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" class="search-input" placeholder="Search exercises, matches, stats...">
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <button class="quick-action-btn">
+            <i class="fa-solid fa-plus"></i>
+            <span>Log Activity</span>
+          </button>
+
+          <button class="topbar-icon-btn" onclick="showToast('No new alerts. Your recovery score is 88%!', 'info', 'Notifications')" title="Notifications">
+            <i class="fa-regular fa-bell"></i>
+            <span class="notification-badge"></span>
+          </button>
+
+          <div class="user-profile-menu" onclick="window.location.href='login.html'" title="Switch Athlete / Profile">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="User Profile" class="user-profile-avatar">
+            <span class="user-profile-label topbar-user-name">Alex Rivera</span>
+            <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--text-muted); margin-left: 0.25rem;"></i>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Page Container -->
+      <main class="page-container">
+        
+        <!-- Welcome Hero & Time Range Pills -->
+        <section class="page-header">
+          <div class="page-title-group">
+            <h1>
+              <span>Welcome Back, Alex!</span>
+              <span class="badge badge-emerald" style="font-size: 0.82rem; padding: 0.35rem 0.75rem;">
+                <i class="fa-solid fa-fire"></i> In The Zone
+              </span>
+            </h1>
+            <p class="page-subtitle">Here is your multi-sport fitness breakdown, volume targets, and recovery score today.</p>
+          </div>
+
+          <div class="header-actions">
+            <!-- Filter Pills -->
+            <div style="display: flex; gap: 0.35rem; background: var(--bg-card); padding: 0.35rem; border-radius: var(--radius-full); border: 1px solid var(--border-subtle);">
+              <button class="btn btn-sm btn-ghost time-filter-pill" data-range="today">Today</button>
+              <button class="btn btn-sm btn-primary time-filter-pill active" data-range="this-week">This Week</button>
+              <button class="btn btn-sm btn-ghost time-filter-pill" data-range="this-month">This Month</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- KPI Metric Cards (4 Highlights) -->
+        <section class="grid-responsive-stats" style="margin-bottom: 2rem;">
+          
+          <!-- Stat 1: Calories -->
+          <div class="card stat-card" style="--stat-glow: rgba(0, 245, 155, 0.2);">
+            <div class="stat-card-header">
+              <div class="stat-icon-wrapper stat-icon-emerald">
+                <i class="fa-solid fa-fire-flame-curved"></i>
+              </div>
+              <span class="stat-trend up">
+                <i class="fa-solid fa-arrow-trend-up"></i> +14%
+              </span>
+            </div>
+            <div class="stat-value">2,450 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 500;">kcal</span></div>
+            <div class="stat-label">Daily Calories Burned</div>
+            <div class="stat-progress">
+              <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 0.35rem; color: var(--text-secondary);">
+                <span>Goal: 2,800 kcal</span>
+                <span>87%</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill progress-fill-emerald" style="width: 87%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stat 2: Active Time -->
+          <div class="card stat-card" style="--stat-glow: rgba(0, 210, 255, 0.2);">
+            <div class="stat-card-header">
+              <div class="stat-icon-wrapper stat-icon-cyan">
+                <i class="fa-solid fa-stopwatch"></i>
+              </div>
+              <span class="stat-trend up">
+                <i class="fa-solid fa-arrow-trend-up"></i> +25 min
+              </span>
+            </div>
+            <div class="stat-value">1h 45m</div>
+            <div class="stat-label">Active Training Today</div>
+            <div class="stat-progress">
+              <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 0.35rem; color: var(--text-secondary);">
+                <span>Target: 2h 00m</span>
+                <span>88%</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill progress-fill-cyan" style="width: 88%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stat 3: Heart Rate -->
+          <div class="card stat-card" style="--stat-glow: rgba(255, 71, 87, 0.2);">
+            <div class="stat-card-header">
+              <div class="stat-icon-wrapper stat-icon-red">
+                <i class="fa-solid fa-heart-pulse fa-beat" style="--fa-animation-duration: 1.5s;"></i>
+              </div>
+              <span class="stat-trend neutral">Zone 3 Aerobic</span>
+            </div>
+            <div class="stat-value">138 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 500;">bpm</span></div>
+            <div class="stat-label">Average Workout Heart Rate</div>
+            <div class="stat-progress">
+              <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 0.35rem; color: var(--text-secondary);">
+                <span>Resting: 58 bpm</span>
+                <span>Peak: 176 bpm</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 72%; background: #ff4757;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stat 4: Recovery Score -->
+          <div class="card stat-card" style="--stat-glow: rgba(168, 85, 247, 0.2);">
+            <div class="stat-card-header">
+              <div class="stat-icon-wrapper stat-icon-purple">
+                <i class="fa-solid fa-battery-three-quarters"></i>
+              </div>
+              <span class="badge badge-emerald">Optimal</span>
+            </div>
+            <div class="stat-value">88%</div>
+            <div class="stat-label">Physiological Recovery</div>
+            <div class="stat-progress">
+              <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 0.35rem; color: var(--text-secondary);">
+                <span>Sleep: 7h 48m</span>
+                <span>HRV: 74ms</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 88%; background: #a855f7;"></div>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- Dedicated Sport Spotlight Fast-Access Cards (3 Pillars) -->
+        <section style="margin-bottom: 2rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+            <h2 style="font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; gap: 0.6rem;">
+              <i class="fa-solid fa-shapes" style="color: var(--primary);"></i>
+              <span>Active Sports Modules</span>
+            </h2>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">Quick Jump to Specialized Dashboards</span>
+          </div>
+
+          <div class="grid-3">
+            
+            <!-- Gym Card -->
+            <div class="card card-interactive" style="border-top: 4px solid var(--primary);">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                <div class="stat-icon-wrapper stat-icon-emerald">
+                  <i class="fa-solid fa-dumbbell"></i>
+                </div>
+                <span class="badge badge-emerald">Scheduled Today</span>
+              </div>
+              <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.35rem;">Gym & Weightlifting</h3>
+              <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.25rem;">
+                Push Routine: Bench Press, Incline DB, Overhead Press. 4 sets completed.
+              </p>
+              <div style="background: var(--bg-primary); padding: 0.75rem 1rem; border-radius: var(--radius-md); margin-bottom: 1.25rem; display: flex; justify-content: space-between; font-size: 0.82rem;">
+                <span>Current Bench PR</span>
+                <strong style="color: var(--primary);">110 kg</strong>
+              </div>
+              <a href="gym.html" class="btn btn-outline btn-full">
+                <span>Open Gym Tracker</span>
+                <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+
+            <!-- Cricket Card -->
+            <div class="card card-interactive" style="border-top: 4px solid var(--accent-cyan);">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                <div class="stat-icon-wrapper stat-icon-cyan">
+                  <i class="fa-solid fa-baseball-bat-ball"></i>
+                </div>
+                <span class="badge badge-cyan">Recent Match</span>
+              </div>
+              <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.35rem;">Cricket Performance</h3>
+              <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.25rem;">
+                T20 vs Strikers: Scored 72* (44b) with 7 fours and 3 sixes. Took 2/28 wickets.
+              </p>
+              <div style="background: var(--bg-primary); padding: 0.75rem 1rem; border-radius: var(--radius-md); margin-bottom: 1.25rem; display: flex; justify-content: space-between; font-size: 0.82rem;">
+                <span>Season Strike Rate</span>
+                <strong style="color: var(--accent-cyan);">138.5 SR</strong>
+              </div>
+              <a href="cricket.html" class="btn btn-outline btn-full">
+                <span>View Cricket Hub</span>
+                <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+
+            <!-- Badminton Card -->
+            <div class="card card-interactive" style="border-top: 4px solid var(--accent-purple);">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                <div class="stat-icon-wrapper stat-icon-purple">
+                  <i class="fa-solid fa-medal"></i>
+                </div>
+                <span class="badge badge-purple">Live Scorer Ready</span>
+              </div>
+              <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.35rem;">Badminton Arena</h3>
+              <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.25rem;">
+                Live point-by-point digital umpire, BWF court service rules, and smash heatmaps.
+              </p>
+              <div style="background: var(--bg-primary); padding: 0.75rem 1rem; border-radius: var(--radius-md); margin-bottom: 1.25rem; display: flex; justify-content: space-between; font-size: 0.82rem;">
+                <span>Win Ratio</span>
+                <strong style="color: var(--primary);">68% (42 Matches)</strong>
+              </div>
+              <a href="badminton.html" class="btn btn-outline btn-full">
+                <span>Launch Badminton Arena</span>
+                <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Charts Layout (2 Columns on Desktop) -->
+        <section class="grid-layout-split" style="margin-bottom: 2rem;">
+          
+          <!-- Chart 1: Weekly Activity & Burn -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">
+                  <i class="fa-solid fa-chart-column"></i> Weekly Burn & Training Time
+                </h3>
+                <p class="card-subtitle">Daily calories burned compared with active minutes</p>
+              </div>
+              <span class="badge badge-emerald">Real-time</span>
+            </div>
+            <div style="height: 300px; width: 100%;">
+              <canvas id="weeklyBurnChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Chart 2: Sports Distribution Doughnut -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">
+                  <i class="fa-solid fa-chart-pie"></i> Sport Discipline Split
+                </h3>
+                <p class="card-subtitle">Time dedicated across sports this month</p>
+              </div>
+            </div>
+            <div style="height: 300px; width: 100%;">
+              <canvas id="sportSplitChart"></canvas>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- Bottom Grid: Recent Activity Feed & Training Schedule -->
+        <section class="grid-layout-split">
+          
+          <!-- Recent Activity Stream -->
+          <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+              <h3 style="font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-clock-rotate-left" style="color: var(--primary);"></i>
+                <span>Recent Sports Activity Stream</span>
+              </h3>
+              <button class="btn btn-sm btn-ghost" onclick="window.refreshDashboardFeed()">
+                <i class="fa-solid fa-rotate-right"></i> Refresh
+              </button>
+            </div>
+
+            <div id="dashboardRecentFeed">
+              <!-- Dynamically populated via dashboard.js from localStorage -->
+            </div>
+          </div>
+
+          <!-- Training Calendar & Streaks -->
+          <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+              <h3 style="font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-regular fa-calendar-check" style="color: var(--accent-cyan);"></i>
+                <span>Upcoming Sessions</span>
+              </h3>
+            </div>
+
+            <div class="card" style="margin-bottom: 1.25rem;">
+              <div style="display: flex; flex-direction: column; gap: 1rem;">
+                
+                <div style="display: flex; align-items: flex-start; gap: 0.85rem; padding-bottom: 0.85rem; border-bottom: 1px solid var(--border-subtle);">
+                  <div style="background: var(--primary-subtle); color: var(--primary); padding: 0.5rem; border-radius: var(--radius-sm); font-weight: 800; font-size: 0.8rem; text-align: center; min-width: 48px;">
+                    <div>TOM</div>
+                    <div style="font-size: 1.1rem; line-height: 1;">30</div>
+                  </div>
+                  <div>
+                    <h4 style="font-size: 0.95rem; font-weight: 700;">Heavy Legs & Hamstrings</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary);">07:00 AM • Target: Squat 150kg</p>
+                    <span class="badge badge-emerald" style="margin-top: 0.3rem;">Gym Workout</span>
+                  </div>
+                </div>
+
+                <div style="display: flex; align-items: flex-start; gap: 0.85rem; padding-bottom: 0.85rem; border-bottom: 1px solid var(--border-subtle);">
+                  <div style="background: var(--accent-cyan-subtle); color: var(--accent-cyan); padding: 0.5rem; border-radius: var(--radius-sm); font-weight: 800; font-size: 0.8rem; text-align: center; min-width: 48px;">
+                    <div>SAT</div>
+                    <div style="font-size: 1.1rem; line-height: 1;">03</div>
+                  </div>
+                  <div>
+                    <h4 style="font-size: 0.95rem; font-weight: 700;">T20 League Semi-Final</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary);">02:30 PM • Riverside Oval Stadium</p>
+                    <span class="badge badge-cyan" style="margin-top: 0.3rem;">Cricket Match</span>
+                  </div>
+                </div>
+
+                <div style="display: flex; align-items: flex-start; gap: 0.85rem;">
+                  <div style="background: var(--accent-purple-subtle); color: var(--accent-purple); padding: 0.5rem; border-radius: var(--radius-sm); font-weight: 800; font-size: 0.8rem; text-align: center; min-width: 48px;">
+                    <div>SUN</div>
+                    <div style="font-size: 1.1rem; line-height: 1;">04</div>
+                  </div>
+                  <div>
+                    <h4 style="font-size: 0.95rem; font-weight: 700;">Singles Practice Match</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary);">10:00 AM • Elite Badminton Court #3</p>
+                    <span class="badge badge-purple" style="margin-top: 0.3rem;">Badminton</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Streak & Milestone Achievement Card -->
+            <div class="card" style="background: linear-gradient(135deg, rgba(255, 159, 26, 0.1) 0%, rgba(20, 28, 44, 0.9) 100%); border-color: rgba(255, 159, 26, 0.3);">
+              <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="font-size: 2.5rem;">🔥</div>
+                <div>
+                  <h4 style="font-size: 1.05rem; font-weight: 800; color: var(--accent-orange);">14-Day Activity Streak!</h4>
+                  <p style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.2rem;">
+                    You are in the top 5% of active athletes this month. 3 more days to unlock the "Iron Discipline" badge.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+      </main>
+
+    </div>
+
+    <!-- Mobile Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+      <a href="index.html" class="bottom-nav-item active">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="gym.html" class="bottom-nav-item">
+        <i class="fa-solid fa-dumbbell"></i>
+        <span>Gym</span>
+      </a>
+      <a href="cricket.html" class="bottom-nav-item">
+        <i class="fa-solid fa-baseball-bat-ball"></i>
+        <span>Cricket</span>
+      </a>
+      <a href="badminton.html" class="bottom-nav-item">
+        <i class="fa-solid fa-medal"></i>
+        <span>Badminton</span>
+      </a>
+      <a href="login.html" class="bottom-nav-item">
+        <i class="fa-solid fa-user"></i>
+        <span>Profile</span>
+      </a>
+    </nav>
+
+  </div>
+
+  <!-- Universal Quick Log Activity Modal -->
+  <div class="modal-overlay" id="quickLogModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-circle-plus" style="color: var(--primary);"></i>
+          <span>Quick Log Activity</span>
+        </div>
+        <button class="modal-close-btn" data-close-modal>
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="quickLogForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="quickLogSport">Sport Category</label>
+            <select id="quickLogSport" class="form-control" required>
+              <option value="Gym">🏋️ Gym & Weightlifting</option>
+              <option value="Cricket">🏏 Cricket Match / Net Session</option>
+              <option value="Badminton">🏸 Badminton Game / Practice</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="quickLogTitle">Session Title</label>
+            <input type="text" id="quickLogTitle" class="form-control" placeholder="e.g. Morning Push Day or T20 League Match" required>
+          </div>
+
+          <div class="grid-2" style="gap: 1rem; margin-bottom: 0;">
+            <div class="form-group">
+              <label class="form-label" for="quickLogDuration">Duration</label>
+              <input type="text" id="quickLogDuration" class="form-control" placeholder="e.g. 1h 15m" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="quickLogCalories">Calories Burned (kcal)</label>
+              <input type="number" id="quickLogCalories" class="form-control" placeholder="e.g. 520" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="quickLogNotes">Highlight / Key Metric</label>
+            <input type="text" id="quickLogNotes" class="form-control" placeholder="e.g. Bench 100kg x 5 reps OR Won 21-18">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal>Cancel</button>
+          <button type="submit" class="btn btn-primary">Save to Feed</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/app.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulseFit - Athlete Registration | Join Sports & Fitness Hub</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/sports.css">
+</head>
+<body class="auth-page">
+
+  <div class="auth-card-container" style="max-width: 1080px;">
+    <!-- Left Showcase Panel (Desktop) -->
+    <div class="auth-showcase-panel">
+      <div>
+        <div class="showcase-badge">
+          <i class="fa-solid fa-trophy"></i> Unleash Your Peak Form
+        </div>
+        
+        <div class="brand-logo" style="margin-bottom: 2rem;">
+          <div class="brand-icon">
+            <i class="fa-solid fa-heart-pulse"></i>
+          </div>
+          <div class="brand-text">PULSE<span>FIT</span></div>
+        </div>
+
+        <h1 class="showcase-title">
+          Track Every Rep, <span>Every Boundary</span> & Every Smash.
+        </h1>
+        
+        <p class="showcase-desc">
+          Join thousands of dedicated athletes who optimize their performance using data-driven insights across their favorite sports.
+        </p>
+
+        <!-- Feature bullet list -->
+        <div style="display: flex; flex-direction: column; gap: 0.9rem; margin-top: 1.5rem;">
+          <div style="display: flex; align-items: center; gap: 0.75rem; color: var(--text-secondary); font-size: 0.92rem;">
+            <i class="fa-solid fa-circle-check" style="color: var(--primary);"></i>
+            <span>Smart 1RM & Progressive Overload volume tracker</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.75rem; color: var(--text-secondary); font-size: 0.92rem;">
+            <i class="fa-solid fa-circle-check" style="color: var(--primary);"></i>
+            <span>Match-by-match cricket batting & bowling economy stats</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.75rem; color: var(--text-secondary); font-size: 0.92rem;">
+            <i class="fa-solid fa-circle-check" style="color: var(--primary);"></i>
+            <span>Live badminton digital referee & rally heatmaps</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 2rem; font-size: 0.85rem; color: var(--text-muted);">
+        🔒 100% Free Athlete Community • No credit card required
+      </div>
+    </div>
+
+    <!-- Right Form Panel -->
+    <div class="auth-form-panel" style="padding: 2.5rem 3rem;">
+      <div class="auth-header" style="margin-bottom: 1.5rem;">
+        <div class="brand-logo" style="margin-bottom: 1.25rem; display: none;" id="mobileAuthLogo">
+          <div class="brand-icon">
+            <i class="fa-solid fa-heart-pulse"></i>
+          </div>
+          <div class="brand-text">PULSE<span>FIT</span></div>
+        </div>
+        <h2>Create Athlete Profile</h2>
+        <p>Already an athlete? <a href="login.html">Sign in here</a></p>
+      </div>
+
+      <!-- Registration Form -->
+      <form id="registerForm">
+        <div class="grid-2" style="gap: 1rem; margin-bottom: 0;">
+          <div class="form-group">
+            <label class="form-label" for="regFullName">Full Name</label>
+            <div class="input-wrapper">
+              <i class="fa-regular fa-user input-icon-left"></i>
+              <input type="text" id="regFullName" class="form-control has-icon-left" placeholder="Alex Rivera" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="regUsername">Athlete Username</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-at input-icon-left"></i>
+              <input type="text" id="regUsername" class="form-control has-icon-left" placeholder="alex_pro" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="regEmail">Email Address</label>
+          <div class="input-wrapper">
+            <i class="fa-regular fa-envelope input-icon-left"></i>
+            <input type="email" id="regEmail" class="form-control has-icon-left" placeholder="alex@pulsefit.io" required>
+          </div>
+        </div>
+
+        <!-- Primary Sports Selection -->
+        <div class="form-group">
+          <label class="form-label">Primary Sports (Select all that apply)</label>
+          <div class="sports-choice-grid">
+            <label class="sport-choice-item">
+              <input type="checkbox" name="sports" value="Gym" checked>
+              <div class="sport-choice-label">
+                <i class="fa-solid fa-dumbbell"></i>
+                <span>Gym & Lift</span>
+              </div>
+            </label>
+            <label class="sport-choice-item">
+              <input type="checkbox" name="sports" value="Cricket" checked>
+              <div class="sport-choice-label">
+                <i class="fa-solid fa-baseball-bat-ball"></i>
+                <span>Cricket</span>
+              </div>
+            </label>
+            <label class="sport-choice-item">
+              <input type="checkbox" name="sports" value="Badminton" checked>
+              <div class="sport-choice-label">
+                <i class="fa-solid fa-medal"></i>
+                <span>Badminton</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Fitness Level -->
+        <div class="form-group">
+          <label class="form-label" for="regFitnessLevel">Current Fitness Level</label>
+          <select id="regFitnessLevel" class="form-control">
+            <option value="Beginner Athlete">Beginner (Getting Started)</option>
+            <option value="Intermediate Athlete">Intermediate (Regular Training)</option>
+            <option value="Advanced Athlete" selected>Advanced (Competitive / Daily)</option>
+            <option value="Pro Athlete">Pro / High Performance</option>
+          </select>
+        </div>
+
+        <div class="grid-2" style="gap: 1rem; margin-bottom: 0;">
+          <div class="form-group">
+            <label class="form-label" for="regPassword">Password</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-lock input-icon-left"></i>
+              <input type="password" id="regPassword" class="form-control has-icon-left" placeholder="Create password" required>
+            </div>
+            <div class="password-strength-meter">
+              <div class="strength-step" id="str1"></div>
+              <div class="strength-step" id="str2"></div>
+              <div class="strength-step" id="str3"></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="regConfirmPassword">Confirm Password</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-shield-halved input-icon-left"></i>
+              <input type="password" id="regConfirmPassword" class="form-control has-icon-left" placeholder="Re-enter password" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 0.5rem; margin-bottom: 1.25rem;">
+          <label class="form-check">
+            <input type="checkbox" id="regTerms" required checked>
+            <span class="form-check-label" style="font-size: 0.8rem;">
+              I agree to the PulseFit <a href="#" style="color: var(--primary);">Terms of Service</a> & <a href="#" style="color: var(--primary);">Privacy Policy</a>
+            </span>
+          </label>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg btn-full" id="regSubmitBtn">
+          <span>Complete Registration</span>
+          <i class="fa-solid fa-user-plus"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/app.js"></script>
+  <script>
+    if (window.innerWidth <= 900) {
+      const mobileLogo = document.getElementById("mobileAuthLogo");
+      if (mobileLogo) mobileLogo.style.display = "flex";
+    }
+
+    // Password Strength Meter
+    const pwd = document.getElementById("regPassword");
+    const s1 = document.getElementById("str1");
+    const s2 = document.getElementById("str2");
+    const s3 = document.getElementById("str3");
+
+    pwd.addEventListener("input", () => {
+      const val = pwd.value;
+      s1.className = "strength-step";
+      s2.className = "strength-step";
+      s3.className = "strength-step";
+
+      if (val.length >= 4) {
+        s1.classList.add("active-weak");
+      }
+      if (val.length >= 7 && /[A-Z0-9]/.test(val)) {
+        s2.classList.add("active-medium");
+      }
+      if (val.length >= 9 && /[^A-Za-z0-9]/.test(val)) {
+        s3.classList.add("active-strong");
+      }
+    });
+
+    // Handle Form Submit
+    document.getElementById("registerForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const p1 = document.getElementById("regPassword").value;
+      const p2 = document.getElementById("regConfirmPassword").value;
+
+      if (p1 !== p2) {
+        showToast("Passwords do not match. Please verify.", "error");
+        return;
+      }
+
+      const fullName = document.getElementById("regFullName").value;
+      const username = document.getElementById("regUsername").value;
+      const email = document.getElementById("regEmail").value;
+      const fitnessLevel = document.getElementById("regFitnessLevel").value;
+
+      const checkedSports = Array.from(document.querySelectorAll('input[name="sports"]:checked')).map(cb => cb.value);
+
+      const newUser = {
+        name: fullName,
+        username: username,
+        email: email,
+        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
+        fitnessLevel: fitnessLevel,
+        streakDays: 1,
+        primarySports: checkedSports
+      };
+
+      localStorage.setItem("pulsefit_user", JSON.stringify(newUser));
+
+      const btn = document.getElementById("regSubmitBtn");
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Setting Up Account...';
+      btn.disabled = true;
+
+      setTimeout(() => {
+        showToast(`Welcome aboard, ${fullName}! Your athlete hub is ready.`, "success");
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 800);
+      }, 700);
+    });
+  </script>
+</body>
+</html>
