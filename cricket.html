@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PulseFit - Cricket Performance Analytics | Sports & Fitness Monitoring</title>
+  <title>Fitora - Cricket Performance Analytics | Sports & Fitness Monitoring</title>
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,7 +32,7 @@
           <div class="brand-icon">
             <i class="fa-solid fa-heart-pulse"></i>
           </div>
-          <div class="brand-text">PULSE<span>FIT</span></div>
+          <div class="brand-text">FIT<span>ORA</span></div>
         </a>
         <button class="sidebar-close-btn" aria-label="Close Sidebar">
           <i class="fa-solid fa-xmark"></i>
@@ -68,6 +68,13 @@
                 <i class="fa-solid fa-medal"></i>
                 <span>Badminton</span>
                 <span class="nav-badge" style="color: var(--primary);">Live</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="diet.html">
+                <i class="fa-solid fa-bowl-food"></i>
+                <span>Diet & Nutrition</span>
+                <span class="nav-badge" style="background: rgba(34, 197, 94, 0.15); color: #22c55e;">Indian</span>
               </a>
             </li>
           </ul>
@@ -138,9 +145,9 @@
             <span class="notification-badge"></span>
           </button>
 
-          <div class="user-profile-menu" onclick="window.location.href='login.html'">
-            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="User Profile" class="user-profile-avatar">
-            <span class="user-profile-label topbar-user-name">Alex Rivera</span>
+          <div class="user-profile-menu" title="Athlete Profile">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="User Profile" class="user-profile-avatar" id="topbarUserAvatar">
+            <span class="user-profile-label topbar-user-name" id="topbarUserName">Alex Rivera</span>
           </div>
         </div>
       </header>
@@ -366,7 +373,7 @@
         <i class="fa-solid fa-medal"></i>
         <span>Badminton</span>
       </a>
-      <a href="login.html" class="bottom-nav-item">
+      <a href="index.html?profile=1" class="bottom-nav-item">
         <i class="fa-solid fa-user"></i>
         <span>Profile</span>
       </a>
@@ -496,6 +503,7 @@
   <div class="toast-container"></div>
 
   <!-- Scripts -->
+  <script src="js/api.js"></script>
   <script src="js/app.js"></script>
   <script src="js/cricket.js"></script>
 </body>

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitora - Sports & Fitness Performance Monitoring Platform</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/sports.css">
+
+  <style>
+    .landing-body {
+      background: var(--bg-primary);
+      color: var(--text-main);
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .landing-header {
+      border-bottom: 1px solid var(--border-subtle);
+      background: rgba(13, 20, 36, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .landing-nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.15rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .landing-hero {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 5rem 1.5rem 4rem;
+      text-align: center;
+    }
+
+    .landing-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(0, 245, 155, 0.1);
+      border: 1px solid rgba(0, 245, 155, 0.25);
+      color: var(--primary);
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 0.4rem 1rem;
+      border-radius: var(--radius-full);
+      margin-bottom: 1.75rem;
+    }
+
+    .landing-title {
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.5rem;
+    }
+
+    .landing-title span.highlight {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent-cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .landing-desc {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--text-secondary);
+      max-width: 720px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.6;
+    }
+
+    .landing-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .landing-features-section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 5rem;
+      width: 100%;
+    }
+
+    .section-heading-center {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .section-heading-center h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-heading-center p {
+      color: var(--text-muted);
+      font-size: 1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .landing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .landing-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 2rem 1.75rem;
+      transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .landing-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-hover);
+      box-shadow: var(--shadow-md);
+    }
+
+    .card-icon-large {
+      width: 54px;
+      height: 54px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .landing-cta-banner {
+      background: linear-gradient(135deg, rgba(20, 28, 44, 0.95), rgba(13, 20, 36, 0.95));
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 3.5rem 2rem;
+      text-align: center;
+      margin: 2rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .landing-footer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 2rem 1.5rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body class="landing-body">
+
+  <!-- Header -->
+  <header class="landing-header">
+    <div class="landing-nav-container">
+      <a href="landing.html" class="brand-logo" style="text-decoration: none;">
+        <div class="brand-icon">
+          <i class="fa-solid fa-heart-pulse"></i>
+        </div>
+        <div class="brand-text">FIT<span>ORA</span></div>
+      </a>
+
+      <div style="display: flex; align-items: center; gap: 0.85rem;" id="navAuthButtons">
+        <a href="login.html" class="btn btn-ghost" id="loginBtnNav">Login</a>
+        <a href="register.html" class="btn btn-primary" id="registerBtnNav">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i> Get Started
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main>
+    <section class="landing-hero">
+      <div class="landing-badge">
+        <i class="fa-solid fa-bolt"></i> Sports & Fitness Intelligence
+      </div>
+      
+      <h1 class="landing-title">
+        Train Smarter. Perform Better.<br>
+        <span class="highlight">Dominate Every Sport.</span>
+      </h1>
+      
+      <p class="landing-desc">
+        The athletic performance monitoring platform engineered for gym lifters, cricket players, and badminton athletes. Track your sets, match figures, and biometrics with zero noise.
+      </p>
+
+      <div class="landing-actions" id="heroAuthActions">
+        <a href="register.html" class="btn btn-primary" style="padding: 0.85rem 2rem; font-size: 1.05rem;" id="heroGetStartedBtn">
+          <i class="fa-solid fa-user-plus"></i> Get Started Free
+        </a>
+        <a href="login.html" class="btn btn-secondary" style="padding: 0.85rem 1.75rem; font-size: 1.05rem;" id="heroLoginBtn">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i> Login
+        </a>
+      </div>
+    </section>
+
+    <!-- Key Sections / Pillars -->
+    <section class="landing-features-section">
+      <div class="section-heading-center">
+        <h2>Built for Core Athletic Disciplines</h2>
+        <p>Targeted tracking modules tailored to the unique physical demands of each sport.</p>
+      </div>
+
+      <div class="landing-grid">
+        <!-- 1. Gym -->
+        <div class="landing-card" style="border-top: 3px solid var(--primary);">
+          <div class="card-icon-large" style="background: rgba(0, 245, 155, 0.1); color: var(--primary);">
+            <i class="fa-solid fa-dumbbell"></i>
+          </div>
+          <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem;">Gym & Strength</h3>
+          <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem; margin-bottom: 1.25rem; flex: 1;">
+            Log exercises, track sets, reps, and volume progressive overload across Push, Pull, Legs, and Hypertrophy routines. Target specific muscle groups and monitor continuous strength progression.
+          </p>
+          <span style="font-size: 0.82rem; color: var(--primary); font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <i class="fa-solid fa-check"></i> Volume & 1RM Overload
+          </span>
+        </div>
+
+        <!-- 2. Cricket -->
+        <div class="landing-card" style="border-top: 3px solid var(--accent-cyan);">
+          <div class="card-icon-large" style="background: rgba(0, 210, 255, 0.1); color: var(--accent-cyan);">
+            <i class="fa-solid fa-baseball-bat-ball"></i>
+          </div>
+          <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem;">Cricket Performance</h3>
+          <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem; margin-bottom: 1.25rem; flex: 1;">
+            Record batting runs, balls faced, strike rates, bowling overs, maiden counts, wickets taken, economy rates, and pitch running distance for both match play and nets practice.
+          </p>
+          <span style="font-size: 0.82rem; color: var(--accent-cyan); font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <i class="fa-solid fa-check"></i> Batting & Bowling Metrics
+          </span>
+        </div>
+
+        <!-- 3. Badminton -->
+        <div class="landing-card" style="border-top: 3px solid var(--accent-purple);">
+          <div class="card-icon-large" style="background: rgba(168, 85, 247, 0.1); color: var(--accent-purple);">
+            <i class="fa-solid fa-medal"></i>
+          </div>
+          <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem;">Badminton Arena</h3>
+          <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem; margin-bottom: 1.25rem; flex: 1;">
+            Analyze match scores, smash volume, rally duration, court speed, and game results across singles and doubles competitions to sharpen court agility and tactical consistency.
+          </p>
+          <span style="font-size: 0.82rem; color: var(--accent-purple); font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <i class="fa-solid fa-check"></i> Rally & Match Tracking
+          </span>
+        </div>
+
+        <!-- 4. Fitness Tracking -->
+        <div class="landing-card" style="border-top: 3px solid #ff9f43;">
+          <div class="card-icon-large" style="background: rgba(255, 159, 67, 0.1); color: #ff9f43;">
+            <i class="fa-solid fa-heart-pulse"></i>
+          </div>
+          <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem;">Fitness Tracking</h3>
+          <p style="color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem; margin-bottom: 1.25rem; flex: 1;">
+            Calculate your personalized BMI, BMR, TDEE, and daily hydration goals. Receive tailored Indian dietary plans matched to your exact dietary preference (Veg / Eggetarian / Non-Veg) and fitness goal.
+          </p>
+          <span style="font-size: 0.82rem; color: #ff9f43; font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <i class="fa-solid fa-check"></i> Biometrics & Indian Nutrition
+          </span>
+        </div>
+      </div>
+
+      <!-- Simple CTA Card -->
+      <div class="landing-cta-banner">
+        <h2 style="font-size: 1.85rem; font-weight: 800; margin-bottom: 0.75rem;">
+          Ready to Elevate Your Training?
+        </h2>
+        <p style="color: var(--text-secondary); max-width: 540px; margin: 0 auto 2rem; font-size: 1rem;">
+          Create your athlete profile today and start tracking your real performance with zero demo clutter.
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+          <a href="register.html" class="btn btn-primary" style="padding: 0.8rem 2rem;">
+            <i class="fa-solid fa-bolt"></i> Get Started
+          </a>
+          <a href="login.html" class="btn btn-secondary" style="padding: 0.8rem 1.75rem;">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i> Login
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="landing-footer">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+      <div style="display: flex; align-items: center; gap: 0.6rem;">
+        <span style="font-weight: 800; color: var(--primary);">FITORA</span>
+        <span style="color: var(--text-muted); font-size: 0.82rem;">— Sports & Fitness Performance Monitoring Platform</span>
+      </div>
+      <div>
+        &copy; 2026 Fitora. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // If user is already authenticated, offer direct path to Dashboard
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('Fitora_token');
+      if (token) {
+        const navContainer = document.getElementById('navAuthButtons');
+        if (navContainer) {
+          navContainer.innerHTML = `
+            <a href="index.html" class="btn btn-primary">
+              <i class="fa-solid fa-table-columns"></i> Go to Dashboard
+            </a>
+          `;
+        }
+        const heroActions = document.getElementById('heroAuthActions');
+        if (heroActions) {
+          heroActions.innerHTML = `
+            <a href="index.html" class="btn btn-primary" style="padding: 0.85rem 2.2rem; font-size: 1.05rem;">
+              <i class="fa-solid fa-table-columns"></i> Open Dashboard
+            </a>
+          `;
+        }
+      }
+    });
+  </script>
+</body>
+</html>

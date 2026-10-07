@@ -1,188 +1,8 @@
 /**
- * PULSEFIT / ATHLEX - CORE APPLICATION CONTROLLER
- * Handles global state, mock data seeding, navigation, modals, and toasts.
+ * Fitora – CORE APPLICATION CONTROLLER
+ * Handles global navigation, modals, toasts, sidebar, and auth UI.
  */
 
-// Default mock athlete data
-const DEFAULT_USER = {
-  name: "Alex Rivera",
-  username: "alex_pro",
-  email: "alex@pulsefit.io",
-  avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
-  fitnessLevel: "Advanced Athlete",
-  streakDays: 14,
-  primarySports: ["Gym", "Cricket", "Badminton"]
-};
-
-// Seed initial state in localStorage if empty
-function initializeMockDatabase() {
-  if (!localStorage.getItem("pulsefit_user")) {
-    localStorage.setItem("pulsefit_user", JSON.stringify(DEFAULT_USER));
-  }
-
-  if (!localStorage.getItem("pulsefit_recent_activities")) {
-    const initialActivities = [
-      {
-        id: "act-1",
-        sport: "Gym",
-        title: "Upper Body Hypertrophy",
-        date: "Today, 08:30 AM",
-        duration: "1h 15m",
-        calories: 520,
-        highlight: "Bench Press 105kg x 3",
-        icon: "fa-dumbbell",
-        badgeClass: "badge-emerald"
-      },
-      {
-        id: "act-2",
-        sport: "Cricket",
-        title: "T20 League Match vs Strikers",
-        date: "Yesterday, 04:00 PM",
-        duration: "2h 45m",
-        calories: 840,
-        highlight: "72* (44) & 2/28",
-        icon: "fa-baseball-bat-ball",
-        badgeClass: "badge-cyan"
-      },
-      {
-        id: "act-3",
-        sport: "Badminton",
-        title: "Club Singles Championship",
-        date: "2 days ago",
-        duration: "55m",
-        calories: 490,
-        highlight: "Won 2-1 (21-17, 18-21, 21-14)",
-        icon: "fa-medal",
-        badgeClass: "badge-purple"
-      },
-      {
-        id: "act-4",
-        sport: "Gym",
-        title: "Legs & Core Power",
-        date: "3 days ago",
-        duration: "1h 05m",
-        calories: 580,
-        highlight: "Squat 140kg x 5",
-        icon: "fa-dumbbell",
-        badgeClass: "badge-emerald"
-      }
-    ];
-    localStorage.setItem("pulsefit_recent_activities", JSON.stringify(initialActivities));
-  }
-
-  // Seed gym data
-  if (!localStorage.getItem("pulsefit_gym_records")) {
-    const gymRecords = {
-      bench: 110,
-      squat: 145,
-      deadlift: 180,
-      overhead: 75,
-      pullups: 25
-    };
-    localStorage.setItem("pulsefit_gym_records", JSON.stringify(gymRecords));
-  }
-
-  // Seed cricket matches
-  if (!localStorage.getItem("pulsefit_cricket_matches")) {
-    const cricketMatches = [
-      {
-        id: "crick-1",
-        opponent: "Strikers CC",
-        format: "T20",
-        venue: "Riverside Oval",
-        date: "Sep 28, 2026",
-        result: "Won by 24 runs",
-        runs: 72,
-        balls: 44,
-        fours: 7,
-        sixes: 3,
-        notOut: true,
-        overs: 4.0,
-        wickets: 2,
-        runsConceded: 28,
-        distanceRun: "4.8 km"
-      },
-      {
-        id: "crick-2",
-        opponent: "Apex Warriors",
-        format: "50-Over",
-        venue: "City Stadium",
-        date: "Sep 21, 2026",
-        result: "Lost by 3 wickets",
-        runs: 48,
-        balls: 52,
-        fours: 5,
-        sixes: 1,
-        notOut: false,
-        overs: 8.0,
-        wickets: 3,
-        runsConceded: 42,
-        distanceRun: "7.2 km"
-      },
-      {
-        id: "crick-3",
-        opponent: "Weekend Nets Intensive",
-        format: "Net Practice",
-        venue: "Athletic Academy",
-        date: "Sep 15, 2026",
-        result: "Completed 60 mins batting",
-        runs: 85,
-        balls: 60,
-        fours: 10,
-        sixes: 4,
-        notOut: true,
-        overs: 5.0,
-        wickets: 4,
-        runsConceded: 18,
-        distanceRun: "3.5 km"
-      }
-    ];
-    localStorage.setItem("pulsefit_cricket_matches", JSON.stringify(cricketMatches));
-  }
-
-  // Seed badminton matches
-  if (!localStorage.getItem("pulsefit_badminton_matches")) {
-    const badmintonMatches = [
-      {
-        id: "badm-1",
-        opponent: "Marcus Vance",
-        mode: "Singles",
-        date: "Sep 27, 2026",
-        scoreSummary: "21-17, 18-21, 21-14",
-        result: "Win",
-        duration: "52m",
-        smashes: 18,
-        unforcedErrors: 9,
-        avgRally: 8.5
-      },
-      {
-        id: "badm-2",
-        opponent: "Liam & Kevin",
-        mode: "Doubles",
-        date: "Sep 23, 2026",
-        scoreSummary: "21-19, 21-16",
-        result: "Win",
-        duration: "40m",
-        smashes: 24,
-        unforcedErrors: 5,
-        avgRally: 6.8
-      },
-      {
-        id: "badm-3",
-        opponent: "Chen Wei",
-        mode: "Singles",
-        date: "Sep 19, 2026",
-        scoreSummary: "19-21, 21-15, 17-21",
-        result: "Loss",
-        duration: "64m",
-        smashes: 15,
-        unforcedErrors: 14,
-        avgRally: 10.2
-      }
-    ];
-    localStorage.setItem("pulsefit_badminton_matches", JSON.stringify(badmintonMatches));
-  }
-}
 
 // Toast notification helper
 function showToast(message, type = "success", title = "") {
@@ -235,6 +55,16 @@ function openModal(modalId) {
   if (modal) {
     modal.classList.add("open");
     document.body.style.overflow = "hidden";
+
+    // If mobile sidebar drawer is open, close it cleanly so modal is fully visible
+    const sidebar = document.querySelector(".sidebar");
+    const overlay = document.querySelector(".sidebar-overlay");
+    if (sidebar && sidebar.classList.contains("open")) {
+      sidebar.classList.remove("open");
+    }
+    if (overlay && overlay.classList.contains("active")) {
+      overlay.classList.remove("active");
+    }
   }
 }
 
@@ -246,9 +76,11 @@ function closeModal(modalId) {
   }
 }
 
+window.openModal = openModal;
+window.closeModal = closeModal;
+
 // Initialize Application UI
 document.addEventListener("DOMContentLoaded", () => {
-  initializeMockDatabase();
 
   // Highlight active nav item based on current URL path
   const currentPath = window.location.pathname.split("/").pop() || "index.html";
@@ -354,9 +186,9 @@ document.addEventListener("DOMContentLoaded", () => {
         badgeClass: badgeMap[sport] || "badge-emerald"
       };
 
-      const activities = JSON.parse(localStorage.getItem("pulsefit_recent_activities") || "[]");
+      const activities = JSON.parse(localStorage.getItem("Fitora_recent_activities") || "[]");
       activities.unshift(newActivity);
-      localStorage.setItem("pulsefit_recent_activities", JSON.stringify(activities));
+      localStorage.setItem("Fitora_recent_activities", JSON.stringify(activities));
 
       closeModal("quickLogModal");
       quickLogForm.reset();
@@ -369,25 +201,71 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Render current user details
-  const storedUser = JSON.parse(localStorage.getItem("pulsefit_user") || "null") || DEFAULT_USER;
-  document.querySelectorAll(".sidebar-user-name, .topbar-user-name").forEach(el => {
-    el.textContent = storedUser.name;
-  });
-  document.querySelectorAll(".sidebar-user-role").forEach(el => {
-    el.textContent = storedUser.fitnessLevel;
-  });
-  document.querySelectorAll(".sidebar-user-avatar, .user-profile-avatar").forEach(el => {
-    el.src = storedUser.avatar;
-  });
+  // Render current user details from localStorage (set on login/register)
+  const storedUser = JSON.parse(localStorage.getItem("Fitora_user") || "null");
+  if (storedUser) {
+    document.querySelectorAll(".sidebar-user-name, .topbar-user-name").forEach(el => {
+      el.textContent = storedUser.name || 'Athlete';
+    });
+    document.querySelectorAll(".sidebar-user-role").forEach(el => {
+      el.textContent = storedUser.fitnessGoal || storedUser.selectedSport || 'Fitora Athlete';
+    });
+    document.querySelectorAll(".sidebar-user-avatar, .user-profile-avatar").forEach(el => {
+      if (storedUser.avatar) el.src = storedUser.avatar;
+    });
+  }
 
-  // Simulated Logout
+  // Logout
   document.querySelectorAll(".sidebar-logout-btn, .logout-action").forEach(btn => {
     btn.addEventListener("click", () => {
-      showToast("Logging out...", "info");
+      if (typeof showToast === "function") showToast("Logging out...", "info");
       setTimeout(() => {
-        window.location.href = "login.html";
-      }, 800);
+        if (window.Fitora && window.Fitora.Auth) {
+          window.Fitora.Auth.logout();
+        } else {
+          localStorage.removeItem('Fitora_token');
+          localStorage.removeItem('Fitora_user');
+          window.location.href = "login.html";
+        }
+      }, 500);
     });
   });
+
+  // Handle profile clicking across all pages
+  document.querySelectorAll(".sidebar-user-card, .user-profile-menu").forEach(card => {
+    card.style.cursor = "pointer";
+    card.addEventListener("click", (e) => {
+      // Don't trigger if logout button was clicked
+      if (e.target.closest(".sidebar-logout-btn")) return;
+      if (typeof window.openProfileModal === "function") {
+        window.openProfileModal();
+      } else {
+        window.location.href = "index.html?profile=1";
+      }
+    });
+  });
+
+  // Handle bottom nav profile link
+  document.querySelectorAll(".bottom-nav-item").forEach(link => {
+    const text = link.textContent.trim().toLowerCase();
+    if (text.includes("profile")) {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (typeof window.openProfileModal === "function") {
+          window.openProfileModal();
+        } else {
+          window.location.href = "index.html?profile=1";
+        }
+      });
+    }
+  });
+
+  // Auto-open profile modal if URL has ?profile=1
+  if (new URLSearchParams(window.location.search).get('profile')) {
+    setTimeout(() => {
+      if (typeof window.openProfileModal === "function") {
+        window.openProfileModal();
+      }
+    }, 250);
+  }
 });

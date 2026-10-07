@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PulseFit - Athlete Dashboard | Sports & Fitness Monitoring</title>
+  <title>Fitora - Athlete Dashboard | Sports & Fitness Monitoring</title>
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,6 +20,19 @@
 
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    (function() {
+      const _urlParams = new URLSearchParams(window.location.search);
+      const _token = _urlParams.get('token');
+      if (_token) {
+        localStorage.setItem('Fitora_token', _token);
+        // Clean the token from the URL immediately so it is never visible
+        history.replaceState({}, document.title, window.location.pathname);
+      } else if (!localStorage.getItem('Fitora_token')) {
+        window.location.replace('landing.html');
+      }
+    })();
+  </script>
 </head>
 <body>
 
@@ -32,7 +45,7 @@
           <div class="brand-icon">
             <i class="fa-solid fa-heart-pulse"></i>
           </div>
-          <div class="brand-text">PULSE<span>FIT</span></div>
+          <div class="brand-text">FIT<span>ORA</span></div>
         </a>
         <button class="sidebar-close-btn" aria-label="Close Sidebar">
           <i class="fa-solid fa-xmark"></i>
@@ -70,6 +83,13 @@
                 <span class="nav-badge" style="color: var(--primary);">Live</span>
               </a>
             </li>
+            <li class="nav-item">
+              <a href="diet.html">
+                <i class="fa-solid fa-bowl-food"></i>
+                <span>Diet & Nutrition</span>
+                <span class="nav-badge" style="background: rgba(34, 197, 94, 0.15); color: #22c55e;">Indian</span>
+              </a>
+            </li>
           </ul>
         </div>
 
@@ -77,29 +97,44 @@
           <div class="nav-section-title">Athlete Insights</div>
           <ul class="nav-list">
             <li class="nav-item">
-              <a href="javascript:void(0)" onclick="showToast('Analytics & Reports view is integrated into individual sport hubs!', 'info')">
+              <a href="javascript:void(0)" onclick="event.stopPropagation(); openBiometricsModal()">
                 <i class="fa-solid fa-chart-line"></i>
                 <span>Biometrics & Heart</span>
               </a>
             </li>
             <li class="nav-item">
-              <a href="javascript:void(0)" onclick="showToast('You have 8 active badges unlocked!', 'info')">
+              <a href="javascript:void(0)" onclick="event.stopPropagation(); openStreakModal()">
                 <i class="fa-solid fa-award"></i>
                 <span>Milestones & Streak</span>
-                <span class="nav-badge" style="background: rgba(255,159,26,0.15); color: var(--accent-orange);">🔥 14d</span>
+                <span class="nav-badge" id="sidebarStreakBadge" style="background: rgba(255,159,26,0.15); color: var(--accent-orange);">🔥 14d</span>
+              </a>
+            </li>
+          </ul>
+          <!-- Extended insights nav items added below -->
+          <ul class="nav-list" style="margin-top: 0;">
+            <li class="nav-item">
+              <a href="javascript:void(0)" onclick="event.stopPropagation(); openBMIModal()">
+                <i class="fa-solid fa-calculator"></i>
+                <span>BMI Calculator</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="javascript:void(0)" onclick="event.stopPropagation(); openProfileModal()">
+                <i class="fa-solid fa-user-gear"></i>
+                <span>Athlete Profile</span>
               </a>
             </li>
           </ul>
         </div>
 
         <!-- Sidebar User Footer Card -->
-        <div class="sidebar-user-card">
-          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="Athlete Avatar" class="sidebar-user-avatar">
+        <div class="sidebar-user-card" onclick="openProfileModal()" style="cursor:pointer;" title="View / Edit Profile">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="Athlete Avatar" class="sidebar-user-avatar" id="sidebarUserAvatar">
           <div class="sidebar-user-info">
-            <div class="sidebar-user-name">Alex Rivera</div>
-            <div class="sidebar-user-role">Advanced Athlete</div>
+            <div class="sidebar-user-name" id="sidebarUserName">Alex Rivera</div>
+            <div class="sidebar-user-role" id="sidebarUserRole">Advanced Athlete</div>
           </div>
-          <button class="sidebar-logout-btn" title="Sign Out">
+          <button class="sidebar-logout-btn" title="Sign Out" onclick="event.stopPropagation(); window.Fitora ? Fitora.Auth.logout() : (window.location.href='login.html');">
             <i class="fa-solid fa-right-from-bracket"></i>
           </button>
         </div>
@@ -123,7 +158,7 @@
         </div>
 
         <div class="topbar-right">
-          <button class="quick-action-btn">
+          <button class="quick-action-btn" onclick="openModal('quickLogModal')">
             <i class="fa-solid fa-plus"></i>
             <span>Log Activity</span>
           </button>
@@ -133,9 +168,9 @@
             <span class="notification-badge"></span>
           </button>
 
-          <div class="user-profile-menu" onclick="window.location.href='login.html'" title="Switch Athlete / Profile">
-            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="User Profile" class="user-profile-avatar">
-            <span class="user-profile-label topbar-user-name">Alex Rivera</span>
+          <div class="user-profile-menu" onclick="openProfileModal()" title="View / Edit Profile" style="cursor:pointer;">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="User Profile" class="user-profile-avatar" id="topbarUserAvatar">
+            <span class="user-profile-label topbar-user-name" id="topbarUserName">Alex Rivera</span>
             <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--text-muted); margin-left: 0.25rem;"></i>
           </div>
         </div>
@@ -148,9 +183,9 @@
         <section class="page-header">
           <div class="page-title-group">
             <h1>
-              <span>Welcome Back, Alex!</span>
+              <span id="welcomeUserName">Welcome to Fitora!</span>
               <span class="badge badge-emerald" style="font-size: 0.82rem; padding: 0.35rem 0.75rem;">
-                <i class="fa-solid fa-fire"></i> In The Zone
+                <i class="fa-solid fa-fire"></i> Athlete Hub
               </span>
             </h1>
             <p class="page-subtitle">Here is your multi-sport fitness breakdown, volume targets, and recovery score today.</p>
@@ -159,8 +194,8 @@
           <div class="header-actions">
             <!-- Filter Pills -->
             <div style="display: flex; gap: 0.35rem; background: var(--bg-card); padding: 0.35rem; border-radius: var(--radius-full); border: 1px solid var(--border-subtle);">
-              <button class="btn btn-sm btn-ghost time-filter-pill" data-range="today">Today</button>
-              <button class="btn btn-sm btn-primary time-filter-pill active" data-range="this-week">This Week</button>
+              <button class="btn btn-sm btn-primary time-filter-pill active" data-range="today">Today</button>
+              <button class="btn btn-sm btn-ghost time-filter-pill" data-range="this-week">This Week</button>
               <button class="btn btn-sm btn-ghost time-filter-pill" data-range="this-month">This Month</button>
             </div>
           </div>
@@ -175,19 +210,19 @@
               <div class="stat-icon-wrapper stat-icon-emerald">
                 <i class="fa-solid fa-fire-flame-curved"></i>
               </div>
-              <span class="stat-trend up">
-                <i class="fa-solid fa-arrow-trend-up"></i> +14%
+              <span class="stat-trend neutral" id="kpiCalTrend">
+                <i class="fa-solid fa-chart-simple"></i> <span id="kpiCalTrendVal">0%</span>
               </span>
             </div>
-            <div class="stat-value">2,450 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 500;">kcal</span></div>
-            <div class="stat-label">Daily Calories Burned</div>
+            <div class="stat-value" id="kpiCaloriesCard">0 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 500;">kcal</span></div>
+            <div class="stat-label" id="kpiCalLabel">Today's Calories Burned</div>
             <div class="stat-progress">
               <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 0.35rem; color: var(--text-secondary);">
-                <span>Goal: 2,800 kcal</span>
-                <span>87%</span>
+                <span id="kpiCalGoalLabel">Goal: -- kcal</span>
+                <span id="kpiCalPct">0%</span>
               </div>
-              <div class="progress-track">
-                <div class="progress-fill progress-fill-emerald" style="width: 87%;"></div>
+              <div class="progress-track kpi-progress-bar">
+                <div class="progress-fill progress-fill-emerald" id="kpiCalProgressFill" style="width: 0%;"></div>
               </div>
             </div>
           </div>
@@ -198,65 +233,121 @@
               <div class="stat-icon-wrapper stat-icon-cyan">
                 <i class="fa-solid fa-stopwatch"></i>
               </div>
-              <span class="stat-trend up">
-                <i class="fa-solid fa-arrow-trend-up"></i> +25 min
+              <span class="stat-trend neutral">
+                <i class="fa-solid fa-clock"></i> <span id="kpiDurationTrend">0 min</span>
               </span>
             </div>
-            <div class="stat-value">1h 45m</div>
-            <div class="stat-label">Active Training Today</div>
+            <div class="stat-value" id="kpiDurationCard">0h 0m</div>
+            <div class="stat-label" id="kpiDurationLabel">Active Training Today</div>
             <div class="stat-progress">
               <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 0.35rem; color: var(--text-secondary);">
-                <span>Target: 2h 00m</span>
-                <span>88%</span>
+                <span id="kpiDurationGoalLabel">Target: 2h 00m</span>
+                <span id="kpiDurationPct">0%</span>
               </div>
               <div class="progress-track">
-                <div class="progress-fill progress-fill-cyan" style="width: 88%;"></div>
+                <div class="progress-fill progress-fill-cyan" id="kpiDurationFill" style="width: 0%;"></div>
               </div>
             </div>
           </div>
 
-          <!-- Stat 3: Heart Rate -->
+          <!-- Stat 3: Workouts / Week -->
           <div class="card stat-card" style="--stat-glow: rgba(255, 71, 87, 0.2);">
             <div class="stat-card-header">
               <div class="stat-icon-wrapper stat-icon-red">
-                <i class="fa-solid fa-heart-pulse fa-beat" style="--fa-animation-duration: 1.5s;"></i>
+                <i class="fa-solid fa-dumbbell"></i>
               </div>
-              <span class="stat-trend neutral">Zone 3 Aerobic</span>
+              <span class="stat-trend neutral" id="kpiWorkoutsTrend">Today</span>
             </div>
-            <div class="stat-value">138 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 500;">bpm</span></div>
-            <div class="stat-label">Average Workout Heart Rate</div>
+            <div class="stat-value" id="kpiWorkoutsCard">0 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 500;">sessions</span></div>
+            <div class="stat-label" id="kpiWorkoutsLabel">Today's Sessions</div>
             <div class="stat-progress">
               <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 0.35rem; color: var(--text-secondary);">
-                <span>Resting: 58 bpm</span>
-                <span>Peak: 176 bpm</span>
+                <span id="kpiBMILabel">BMI: --</span>
+                <span id="kpiStreakLabel">Streak: 0d</span>
               </div>
               <div class="progress-track">
-                <div class="progress-fill" style="width: 72%; background: #ff4757;"></div>
+                <div class="progress-fill" id="kpiWorkoutsFill" style="width: 0%; background: #ff4757;"></div>
               </div>
             </div>
           </div>
 
-          <!-- Stat 4: Recovery Score -->
+          <!-- Stat 4: Water & Recovery -->
           <div class="card stat-card" style="--stat-glow: rgba(168, 85, 247, 0.2);">
             <div class="stat-card-header">
               <div class="stat-icon-wrapper stat-icon-purple">
-                <i class="fa-solid fa-battery-three-quarters"></i>
+                <i class="fa-solid fa-droplet"></i>
               </div>
-              <span class="badge badge-emerald">Optimal</span>
+              <span class="badge badge-outline" id="kpiRecoveryBadge">Daily Goal</span>
             </div>
-            <div class="stat-value">88%</div>
-            <div class="stat-label">Physiological Recovery</div>
+            <div class="stat-value" id="kpiWaterCard">0.0 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 500;">L</span></div>
+            <div class="stat-label">Daily Water Target</div>
             <div class="stat-progress">
               <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 0.35rem; color: var(--text-secondary);">
-                <span>Sleep: 7h 48m</span>
-                <span>HRV: 74ms</span>
+                <span id="kpiTDEELabel">TDEE: --</span>
+                <span id="kpiBMRLabel">BMR: --</span>
               </div>
               <div class="progress-track">
-                <div class="progress-fill" style="width: 88%; background: #a855f7;"></div>
+                <div class="progress-fill" id="kpiWaterFill" style="width: 0%; background: #a855f7;"></div>
               </div>
             </div>
           </div>
 
+        </section>
+
+        <!-- Daily Steps Tracking & Google Fit Hub -->
+        <section class="card" style="margin-bottom: 2rem; padding: 1.35rem 1.5rem; background: var(--card-bg); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+            <div>
+              <h2 style="font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 0.6rem; margin: 0 0 0.25rem 0;">
+                <i class="fa-solid fa-shoe-prints" style="color: var(--primary);"></i>
+                <span>Daily Steps Tracking</span>
+              </h2>
+              <p style="color: var(--text-secondary); font-size: 0.85rem; margin: 0;">
+                Real-time pedometer and distance monitoring synced with Google Health & Fit
+              </p>
+            </div>
+            <div style="display: flex; gap: 0.6rem; align-items: center;">
+              <button class="btn btn-sm btn-outline" id="logStepsManualBtn" onclick="openLogStepsModal()">
+                <i class="fa-solid fa-plus"></i> Log Steps
+              </button>
+              <button class="btn btn-sm btn-primary" id="googleFitConnectBtn" onclick="handleGoogleFitAction()">
+                <i class="fa-brands fa-google"></i> <span id="googleFitBtnText">Connect Google Fit</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 3 Steps Metrics Cards -->
+          <div class="grid-3" style="gap: 1rem;">
+            <!-- Today's Steps -->
+            <div style="background: var(--bg-primary); padding: 1.15rem; border-radius: var(--radius-md); border-left: 4px solid var(--primary);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                <span style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 700;">Today's Steps</span>
+                <i class="fa-solid fa-person-walking" style="color: var(--primary); font-size: 0.95rem;"></i>
+              </div>
+              <div style="font-size: 1.75rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem;" id="stepMetricToday">0 <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">steps</span></div>
+              <div style="font-size: 0.78rem; color: var(--text-secondary);" id="stepMetricTodaySub">Daily Goal: 10,000 steps</div>
+            </div>
+
+            <!-- This Week -->
+            <div style="background: var(--bg-primary); padding: 1.15rem; border-radius: var(--radius-md); border-left: 4px solid var(--accent-cyan);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                <span style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 700;">This Week</span>
+                <i class="fa-solid fa-calendar-week" style="color: var(--accent-cyan); font-size: 0.95rem;"></i>
+              </div>
+              <div style="font-size: 1.75rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem;" id="stepMetricWeek">0 <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">steps</span></div>
+              <div style="font-size: 0.78rem; color: var(--text-secondary);" id="stepMetricWeekSub">Current week total</div>
+            </div>
+
+            <!-- This Month -->
+            <div style="background: var(--bg-primary); padding: 1.15rem; border-radius: var(--radius-md); border-left: 4px solid var(--accent-purple);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                <span style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 700;">This Month</span>
+                <i class="fa-solid fa-calendar-days" style="color: var(--accent-purple); font-size: 0.95rem;"></i>
+              </div>
+              <div style="font-size: 1.75rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem;" id="stepMetricMonth">0 <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">steps</span></div>
+              <div style="font-size: 0.78rem; color: var(--text-secondary);" id="stepMetricMonthSub">Current month total</div>
+            </div>
+          </div>
         </section>
 
         <!-- Dedicated Sport Spotlight Fast-Access Cards (3 Pillars) -->
@@ -381,14 +472,19 @@
           
           <!-- Recent Activity Stream -->
           <div>
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
-              <h3 style="font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+              <h3 style="font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem; margin: 0;">
                 <i class="fa-solid fa-clock-rotate-left" style="color: var(--primary);"></i>
-                <span>Recent Sports Activity Stream</span>
+                <span id="recentActivityHeaderTitle">Recent Sports Activity</span>
               </h3>
-              <button class="btn btn-sm btn-ghost" onclick="window.refreshDashboardFeed()">
-                <i class="fa-solid fa-rotate-right"></i> Refresh
-              </button>
+              <div style="display: flex; gap: 0.4rem; align-items: center;">
+                <button class="btn btn-sm btn-ghost" id="recentActivityResetBtn" style="display: none; font-size: 0.78rem;" onclick="window.resetDashboardFeedToAll()">
+                  <i class="fa-solid fa-list-ul"></i> Show All
+                </button>
+                <button class="btn btn-sm btn-ghost" onclick="window.refreshDashboardFeed()">
+                  <i class="fa-solid fa-rotate-right"></i> Refresh
+                </button>
+              </div>
             </div>
 
             <div id="dashboardRecentFeed">
@@ -398,63 +494,114 @@
 
           <!-- Training Calendar & Streaks -->
           <div>
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
-              <h3 style="font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
-                <i class="fa-regular fa-calendar-check" style="color: var(--accent-cyan);"></i>
-                <span>Upcoming Sessions</span>
-              </h3>
+            <!-- Live Training Calendar Card -->
+            <div class="calendar-widget" id="liveCalendarWidget">
+              <div class="calendar-header-bar">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <i class="fa-regular fa-calendar-check" style="color: var(--accent-cyan); font-size: 1.1rem;"></i>
+                  <span class="calendar-month-title" id="calMonthYearTitle">Loading Calendar...</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.35rem;">
+                  <button class="calendar-nav-btn" id="calPrevMonthBtn" title="Previous Month">
+                    <i class="fa-solid fa-chevron-left" style="font-size: 0.75rem;"></i>
+                  </button>
+                  <button class="btn btn-sm btn-secondary" id="calTodayBtn" style="padding: 0.25rem 0.6rem; font-size: 0.72rem;">Today</button>
+                  <button class="calendar-nav-btn" id="calNextMonthBtn" title="Next Month">
+                    <i class="fa-solid fa-chevron-right" style="font-size: 0.75rem;"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Weekday Headers -->
+              <div class="calendar-weekdays-row">
+                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+              </div>
+
+              <!-- Days Grid -->
+              <div class="calendar-days-grid" id="calDaysGrid">
+                <!-- Dynamically generated days -->
+              </div>
+
+              <!-- Calendar Legend -->
+              <div class="calendar-legend-bar">
+                <div class="calendar-legend-item">
+                  <span class="cal-day-dot status-completed"></span>
+                  <span>Completed</span>
+                </div>
+                <div class="calendar-legend-item">
+                  <span class="cal-day-dot status-partial"></span>
+                  <span>Partial</span>
+                </div>
+                <div class="calendar-legend-item">
+                  <span class="cal-day-dot status-scheduled"></span>
+                  <span>Scheduled</span>
+                </div>
+                <div class="calendar-legend-item">
+                  <span class="cal-day-dot status-missed"></span>
+                  <span>Missed</span>
+                </div>
+                <div class="calendar-legend-item">
+                  <span class="cal-day-dot status-rest"></span>
+                  <span>Rest</span>
+                </div>
+              </div>
             </div>
 
+            <!-- Monthly Performance & Trend Tracking Card -->
             <div class="card" style="margin-bottom: 1.25rem;">
-              <div style="display: flex; flex-direction: column; gap: 1rem;">
-                
-                <div style="display: flex; align-items: flex-start; gap: 0.85rem; padding-bottom: 0.85rem; border-bottom: 1px solid var(--border-subtle);">
-                  <div style="background: var(--primary-subtle); color: var(--primary); padding: 0.5rem; border-radius: var(--radius-sm); font-weight: 800; font-size: 0.8rem; text-align: center; min-width: 48px;">
-                    <div>TOM</div>
-                    <div style="font-size: 1.1rem; line-height: 1;">30</div>
-                  </div>
-                  <div>
-                    <h4 style="font-size: 0.95rem; font-weight: 700;">Heavy Legs & Hamstrings</h4>
-                    <p style="font-size: 0.8rem; color: var(--text-secondary);">07:00 AM • Target: Squat 150kg</p>
-                    <span class="badge badge-emerald" style="margin-top: 0.3rem;">Gym Workout</span>
-                  </div>
-                </div>
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem;">
+                <h4 style="font-size: 0.98rem; font-weight: 800; display: flex; align-items: center; gap: 0.45rem;">
+                  <i class="fa-solid fa-chart-line" style="color: var(--primary);"></i>
+                  <span>Monthly Performance</span>
+                </h4>
+                <span class="badge badge-emerald" id="calPerfTrendBadge">
+                  <i class="fa-solid fa-arrow-trend-up"></i> <span id="calPerfTrendLabel">Improving</span>
+                </span>
+              </div>
 
-                <div style="display: flex; align-items: flex-start; gap: 0.85rem; padding-bottom: 0.85rem; border-bottom: 1px solid var(--border-subtle);">
-                  <div style="background: var(--accent-cyan-subtle); color: var(--accent-cyan); padding: 0.5rem; border-radius: var(--radius-sm); font-weight: 800; font-size: 0.8rem; text-align: center; min-width: 48px;">
-                    <div>SAT</div>
-                    <div style="font-size: 1.1rem; line-height: 1;">03</div>
-                  </div>
-                  <div>
-                    <h4 style="font-size: 0.95rem; font-weight: 700;">T20 League Semi-Final</h4>
-                    <p style="font-size: 0.8rem; color: var(--text-secondary);">02:30 PM • Riverside Oval Stadium</p>
-                    <span class="badge badge-cyan" style="margin-top: 0.3rem;">Cricket Match</span>
-                  </div>
+              <div class="perf-metrics-grid">
+                <div class="perf-metric-box">
+                  <div class="perf-metric-label">Completed Workouts</div>
+                  <div class="perf-metric-value" id="calPerfWorkouts">--</div>
                 </div>
-
-                <div style="display: flex; align-items: flex-start; gap: 0.85rem;">
-                  <div style="background: var(--accent-purple-subtle); color: var(--accent-purple); padding: 0.5rem; border-radius: var(--radius-sm); font-weight: 800; font-size: 0.8rem; text-align: center; min-width: 48px;">
-                    <div>SUN</div>
-                    <div style="font-size: 1.1rem; line-height: 1;">04</div>
-                  </div>
-                  <div>
-                    <h4 style="font-size: 0.95rem; font-weight: 700;">Singles Practice Match</h4>
-                    <p style="font-size: 0.8rem; color: var(--text-secondary);">10:00 AM • Elite Badminton Court #3</p>
-                    <span class="badge badge-purple" style="margin-top: 0.3rem;">Badminton</span>
-                  </div>
+                <div class="perf-metric-box">
+                  <div class="perf-metric-label">Completion Rate</div>
+                  <div class="perf-metric-value" style="color: var(--primary);" id="calPerfRate">--</div>
                 </div>
+                <div class="perf-metric-box">
+                  <div class="perf-metric-label">Total Duration</div>
+                  <div class="perf-metric-value" style="color: var(--accent-cyan);" id="calPerfDuration">--</div>
+                </div>
+                <div class="perf-metric-box">
+                  <div class="perf-metric-label">Calories Burned</div>
+                  <div class="perf-metric-value" style="color: var(--accent-orange);" id="calPerfCalories">--</div>
+                </div>
+                <div class="perf-metric-box">
+                  <div class="perf-metric-label">Avg Performance</div>
+                  <div class="perf-metric-value" id="calPerfScore">--</div>
+                </div>
+                <div class="perf-metric-box">
+                  <div class="perf-metric-label">Consistency</div>
+                  <div class="perf-metric-value" id="calPerfConsistency">--</div>
+                </div>
+              </div>
 
+              <div style="padding: 0.65rem 0.85rem; background: rgba(0, 245, 155, 0.05); border: 1px solid rgba(0, 245, 155, 0.15); border-radius: var(--radius-sm); font-size: 0.78rem; color: var(--text-secondary); line-height: 1.4;" id="calPerfNote">
+                Comparing current training volume and completion against your 30-day baseline.
               </div>
             </div>
 
             <!-- Streak & Milestone Achievement Card -->
-            <div class="card" style="background: linear-gradient(135deg, rgba(255, 159, 26, 0.1) 0%, rgba(20, 28, 44, 0.9) 100%); border-color: rgba(255, 159, 26, 0.3);">
+            <div class="card" style="background: linear-gradient(135deg, rgba(255, 159, 26, 0.1) 0%, rgba(20, 28, 44, 0.9) 100%); border-color: rgba(255, 159, 26, 0.3); cursor: pointer;" onclick="openStreakModal()">
               <div style="display: flex; align-items: center; gap: 1rem;">
                 <div style="font-size: 2.5rem;">🔥</div>
-                <div>
-                  <h4 style="font-size: 1.05rem; font-weight: 800; color: var(--accent-orange);">14-Day Activity Streak!</h4>
+                <div style="flex: 1;">
+                  <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <h4 style="font-size: 1.05rem; font-weight: 800; color: var(--accent-orange);" id="calStreakTitle">14-Day Activity Streak!</h4>
+                    <span class="badge badge-orange" id="calBestStreakBadge">Best: 14d</span>
+                  </div>
                   <p style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.2rem;">
-                    You are in the top 5% of active athletes this month. 3 more days to unlock the "Iron Discipline" badge.
+                    You are in the top 5% of active athletes this month. Keep your streak alive today!
                   </p>
                 </div>
               </div>
@@ -486,12 +633,211 @@
         <i class="fa-solid fa-medal"></i>
         <span>Badminton</span>
       </a>
-      <a href="login.html" class="bottom-nav-item">
+      <a href="javascript:void(0)" class="bottom-nav-item" onclick="openProfileModal()">
         <i class="fa-solid fa-user"></i>
         <span>Profile</span>
       </a>
     </nav>
 
+  </div>
+
+  <!-- Modal: Biometrics & Heart -->
+  <div class="modal-overlay" id="biometricsModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-heart-pulse" style="color: #ff4757;"></i>
+          <span>Athlete Biometrics & Cardiovascular Metrics</span>
+        </div>
+        <button class="modal-close-btn" data-close-modal>
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body" style="overflow-y: auto; max-height: calc(85vh - 130px);">
+        <!-- Top Biometrics KPI Grid -->
+        <div class="grid-responsive-stats" style="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.85rem; margin-bottom: 1.25rem;">
+          <div class="card" style="padding: 1rem; text-align: center; background: rgba(0, 245, 155, 0.05); border-color: rgba(0, 245, 155, 0.2);">
+            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem; font-weight: 600;">BMI SCORE</div>
+            <div id="bioBmiVal" style="font-size: 1.6rem; font-weight: 800; color: #00f59b;">--</div>
+            <span id="bioBmiCategory" class="badge badge-emerald" style="margin-top: 0.25rem; font-size: 0.72rem;">Normal</span>
+          </div>
+
+          <div class="card" style="padding: 1rem; text-align: center; background: rgba(0, 210, 255, 0.05); border-color: rgba(0, 210, 255, 0.2);">
+            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem; font-weight: 600;">BMR (BASAL)</div>
+            <div id="bioBmrVal" style="font-size: 1.6rem; font-weight: 800; color: #00d2ff;">--</div>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">kcal / day</span>
+          </div>
+
+          <div class="card" style="padding: 1rem; text-align: center; background: rgba(255, 159, 26, 0.05); border-color: rgba(255, 159, 26, 0.2);">
+            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem; font-weight: 600;">DAILY TDEE</div>
+            <div id="bioTdeeVal" style="font-size: 1.6rem; font-weight: 800; color: #ff9f1a;">--</div>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">kcal / day</span>
+          </div>
+
+          <div class="card" style="padding: 1rem; text-align: center; background: rgba(168, 85, 247, 0.05); border-color: rgba(168, 85, 247, 0.2);">
+            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem; font-weight: 600;">WATER TARGET</div>
+            <div id="bioWaterVal" style="font-size: 1.6rem; font-weight: 800; color: #a855f7;">--</div>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">Litres / day</span>
+          </div>
+        </div>
+
+        <!-- Resting Heart Rate Box -->
+        <div class="card" style="background: rgba(255, 71, 87, 0.05); border: 1px solid rgba(255, 71, 87, 0.25); padding: 1.15rem; margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+            <div>
+              <div style="font-weight: 700; font-size: 1rem; color: #ff4757; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+                <i class="fa-solid fa-heart-pulse fa-beat"></i> Resting Heart Rate (RHR)
+              </div>
+              <p style="font-size: 0.82rem; color: var(--text-secondary); max-width: 480px; margin: 0; line-height: 1.4;">
+                Manually entered resting pulse measured upon waking. Normal adult resting range is typically 60–100 bpm (well-trained endurance athletes may be 40–60 bpm).
+              </p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <input type="number" id="bioHeartRateInput" class="form-control" style="width: 100px; text-align: center; font-weight: 700;" min="30" max="200" placeholder="72">
+              <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">BPM</span>
+              <button type="button" class="btn btn-sm btn-primary" id="saveHeartRateBtn" style="background: #ff4757; border-color: #ff4757;">Save</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Body Profile Edit Form -->
+        <form id="bioProfileForm">
+          <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-solid fa-user-gear" style="color: var(--primary);"></i> Update Athlete Body Information
+          </h4>
+
+          <div class="grid-2" style="gap: 0.85rem; margin-bottom: 0.85rem;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="bioHeight">Height (cm) <span style="color: #ff4757;">*</span></label>
+              <input type="number" id="bioHeight" class="form-control" placeholder="175" min="90" max="250" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="bioWeight">Weight (kg) <span style="color: #ff4757;">*</span></label>
+              <input type="number" id="bioWeight" class="form-control" placeholder="72" min="30" max="250" step="0.1" required>
+            </div>
+          </div>
+
+          <div class="grid-2" style="gap: 0.85rem; margin-bottom: 0.85rem;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="bioAge">Age (years)</label>
+              <input type="number" id="bioAge" class="form-control" placeholder="24" min="10" max="100">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="bioGender">Biological Gender</label>
+              <select id="bioGender" class="form-control">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid-2" style="gap: 0.85rem; margin-bottom: 0.85rem;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="bioActivityLevel">Activity Level</label>
+              <select id="bioActivityLevel" class="form-control">
+                <option value="Sedentary">Sedentary (Little or no exercise)</option>
+                <option value="Lightly Active">Lightly Active (Exercise 1-3 days/week)</option>
+                <option value="Moderately Active">Moderately Active (Exercise 3-5 days/week)</option>
+                <option value="Very Active">Very Active (Hard training 6-7 days/week)</option>
+                <option value="Extremely Active">Extremely Active (Athletic/Physical job + 2x daily)</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="bioFitnessGoal">Fitness & Training Goal</label>
+              <select id="bioFitnessGoal" class="form-control">
+                <option value="Muscle building">Muscle building (Calorie surplus)</option>
+                <option value="Fat loss">Fat loss (Caloric deficit)</option>
+                <option value="Sports performance">Sports performance (High glycogen output)</option>
+                <option value="General fitness">General fitness & health</option>
+                <option value="Weight maintenance">Weight maintenance</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1rem;">
+            <button type="submit" class="btn btn-primary" id="saveBioProfileBtn">
+              <i class="fa-solid fa-floppy-disk"></i> Save & Recalculate Biometrics
+            </button>
+          </div>
+        </form>
+
+        <!-- Medical Disclaimer Notice -->
+        <div style="margin-top: 1rem; padding: 0.75rem 1rem; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">
+          <i class="fa-solid fa-shield-halved" style="color: var(--accent-cyan); margin-right: 0.35rem;"></i>
+          <strong>Health Notice:</strong> BMI and caloric expenditure algorithms (Mifflin-St Jeor) are general athletic screening metrics, not clinical medical diagnoses. For customized medical, body composition, or cardiac evaluations, please consult a licensed healthcare professional.
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-close-modal>Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Milestones & Streak -->
+  <div class="modal-overlay" id="streakModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-award" style="color: #ff9f1a;"></i>
+          <span>Athlete Milestones & Active Streak</span>
+        </div>
+        <button class="modal-close-btn" data-close-modal>
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div style="text-align: center; padding: 1.5rem 1rem; background: linear-gradient(135deg, rgba(255, 159, 26, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%); border-radius: var(--radius-lg); margin-bottom: 1.25rem; border: 1px solid rgba(255, 159, 26, 0.25);">
+          <div style="font-size: 3rem; margin-bottom: 0.25rem;">🔥</div>
+          <div style="font-size: 2.2rem; font-weight: 800; color: #ff9f1a;" id="streakModalDays">14 Days</div>
+          <div style="font-size: 0.9rem; color: var(--text-secondary); font-weight: 600;">Active Daily Training Streak</div>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.4;">
+            Keep logging your workouts, net sessions, and matches to maintain your consistency streak!
+          </p>
+        </div>
+
+        <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-primary);">
+          <i class="fa-solid fa-trophy" style="color: var(--primary); margin-right: 0.35rem;"></i> Unlocked Milestones
+        </h4>
+        <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md);">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <span style="font-size: 1.4rem;">🏋️</span>
+              <div>
+                <strong style="font-size: 0.88rem; color: #fff; display: block;">Century Lifter</strong>
+                <span style="font-size: 0.78rem; color: var(--text-secondary);">Bench pressed 100+ kg mark</span>
+              </div>
+            </div>
+            <span class="badge badge-emerald">Unlocked</span>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md);">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <span style="font-size: 1.4rem;">🏏</span>
+              <div>
+                <strong style="font-size: 0.88rem; color: #fff; display: block;">Power Hitter</strong>
+                <span style="font-size: 0.78rem; color: var(--text-secondary);">Strike rate above 135 in T20</span>
+              </div>
+            </div>
+            <span class="badge badge-cyan">Unlocked</span>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md);">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <span style="font-size: 1.4rem;">🏸</span>
+              <div>
+                <strong style="font-size: 0.88rem; color: #fff; display: block;">Court Dominance</strong>
+                <span style="font-size: 0.78rem; color: var(--text-secondary);">Won 40+ career badminton matches</span>
+              </div>
+            </div>
+            <span class="badge badge-purple">Unlocked</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-close-modal>Close</button>
+      </div>
+    </div>
   </div>
 
   <!-- Universal Quick Log Activity Modal -->
@@ -549,11 +895,968 @@
     </div>
   </div>
 
+  <!-- ── Athlete Profile Modal ────────────────────────────────────────────── -->
+  <div class="modal-overlay" id="profileModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-user-astronaut" style="color: var(--primary);"></i>
+          <span>Athlete Profile</span>
+        </div>
+        <button class="modal-close-btn" data-close-modal><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body" style="overflow-y: auto; max-height: calc(85vh - 130px);">
+        <form id="profileModalForm">
+          <div class="grid-2" style="gap: 0.85rem; margin-bottom: 0.85rem;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Full Name</label>
+              <input type="text" id="pmName" class="form-control" placeholder="Alex Rivera">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Email</label>
+              <input type="email" id="pmEmail" class="form-control" placeholder="alex@fitora.io" readonly style="opacity:0.7;">
+            </div>
+          </div>
+          <div class="grid-2" style="gap: 0.85rem; margin-bottom: 0.85rem;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Height (cm) <span style="color:#ff4757;">*</span></label>
+              <input type="number" id="pmHeight" class="form-control" placeholder="175" min="90" max="250">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Weight (kg) <span style="color:#ff4757;">*</span></label>
+              <input type="number" id="pmWeight" class="form-control" placeholder="72" min="30" max="300" step="0.1">
+            </div>
+          </div>
+          <div class="grid-2" style="gap: 0.85rem; margin-bottom: 0.85rem;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Age</label>
+              <input type="number" id="pmAge" class="form-control" placeholder="24" min="10" max="100">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Gender</label>
+              <select id="pmGender" class="form-control">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid-2" style="gap: 0.85rem; margin-bottom: 0.85rem;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Activity Level</label>
+              <select id="pmActivityLevel" class="form-control">
+                <option value="Sedentary">Sedentary</option>
+                <option value="Lightly Active">Lightly Active</option>
+                <option value="Moderately Active">Moderately Active</option>
+                <option value="Very Active">Very Active</option>
+                <option value="Extremely Active">Extremely Active</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Fitness Goal</label>
+              <select id="pmFitnessGoal" class="form-control">
+                <option value="Muscle building">Muscle Building</option>
+                <option value="Fat loss">Fat Loss</option>
+                <option value="Sports performance">Sports Performance</option>
+                <option value="General fitness">General Fitness</option>
+                <option value="Weight maintenance">Weight Maintenance</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid-2" style="gap: 0.85rem; margin-bottom: 0.85rem;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Primary Sport</label>
+              <select id="pmSport" class="form-control">
+                <option value="Gym">Gym & Weightlifting</option>
+                <option value="Cricket">Cricket</option>
+                <option value="Badminton">Badminton</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Dietary Preference</label>
+              <select id="pmDiet" class="form-control">
+                <option value="Vegetarian">Vegetarian</option>
+                <option value="Eggetarian">Eggetarian (Veg + Eggs)</option>
+                <option value="Non-Vegetarian">Non-Vegetarian</option>
+              </select>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1rem;">
+            <button type="button" class="btn btn-secondary" data-close-modal>Cancel</button>
+            <button type="submit" class="btn btn-primary" id="saveProfileModalBtn">
+              <i class="fa-solid fa-floppy-disk"></i> Save Profile
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BMI Calculator Modal ──────────────────────────────────────────────── -->
+  <div class="modal-overlay" id="bmiCalcModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-calculator" style="color: var(--accent-cyan);"></i>
+          <span>BMI Calculator</span>
+        </div>
+        <button class="modal-close-btn" data-close-modal><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; padding: 0.75rem 1rem; background: rgba(0,210,255,0.05); border: 1px solid rgba(0,210,255,0.2); border-radius: var(--radius-md);">
+          <label class="form-check" style="margin:0; cursor:pointer;">
+            <input type="checkbox" id="bmiUseSavedProfile" style="margin-right:0.5rem;">
+            <span class="form-check-label" style="font-size:0.88rem;">Use saved profile (auto-fill height & weight)</span>
+          </label>
+        </div>
+        <div class="grid-2" style="gap: 1rem; margin-bottom: 1rem;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Height (cm)</label>
+            <input type="number" id="bmiHeight" class="form-control" placeholder="175" min="90" max="250">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Weight (kg)</label>
+            <input type="number" id="bmiWeight" class="form-control" placeholder="72" min="30" max="300" step="0.1">
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary btn-full" id="bmiCalcBtn" style="margin-bottom: 1.25rem;">
+          <i class="fa-solid fa-calculator"></i> Calculate BMI
+        </button>
+        <div id="bmiResultBox" style="display:none; padding: 1.25rem; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md);">
+          <div style="text-align: center; margin-bottom: 1rem;">
+            <div id="bmiScore" style="font-size: 3rem; font-weight: 800; line-height: 1;"></div>
+            <span id="bmiCategory" class="badge" style="margin-top: 0.35rem; font-size: 0.85rem;"></span>
+          </div>
+          <p id="bmiDescription" style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0.75rem;"></p>
+          <div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; padding: 0.65rem; background: rgba(255,255,255,0.02); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+            <i class="fa-solid fa-circle-info" style="color: var(--accent-cyan); margin-right: 0.35rem;"></i>
+            BMI is a screening metric, not a clinical diagnosis. Athletic body composition may differ by muscle mass.
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-close-modal>Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Calendar Day Training Details Modal ───────────────────────────── -->
+  <div class="modal-overlay" id="calendarDayModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title" style="display: flex; align-items: center; gap: 0.6rem;">
+          <i class="fa-regular fa-calendar-days" style="color: var(--accent-cyan);"></i>
+          <span id="calDayModalTitle">Training Session</span>
+        </div>
+        <button class="modal-close-btn" data-close-modal><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+          <div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;" id="calDayModalDate">Sunday, Oct 4, 2026</div>
+            <h3 style="font-size: 1.2rem; font-weight: 800; margin-top: 0.2rem;" id="calDayModalSessionName">Heavy Legs & Core</h3>
+          </div>
+          <div style="display: flex; gap: 0.4rem;">
+            <span class="badge badge-cyan" id="calDayModalSportBadge">Gym</span>
+            <span class="badge badge-emerald" id="calDayModalStatusBadge">Completed</span>
+          </div>
+        </div>
+
+        <div class="grid-3" style="gap: 0.75rem; margin-bottom: 1.25rem;">
+          <div class="card" style="padding: 0.85rem; text-align: center;">
+            <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Duration</div>
+            <div style="font-size: 1.15rem; font-weight: 800; color: var(--accent-cyan); margin-top: 0.2rem;" id="calDayModalDuration">60m</div>
+          </div>
+          <div class="card" style="padding: 0.85rem; text-align: center;">
+            <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Calories</div>
+            <div style="font-size: 1.15rem; font-weight: 800; color: var(--accent-orange); margin-top: 0.2rem;" id="calDayModalCalories">520 kcal</div>
+          </div>
+          <div class="card" style="padding: 0.85rem; text-align: center;">
+            <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Score</div>
+            <div style="font-size: 1.15rem; font-weight: 800; color: var(--primary); margin-top: 0.2rem;" id="calDayModalScore">88 / 100</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <h4 style="font-size: 0.88rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.5rem;">
+            Planned Exercises & Drills
+          </h4>
+          <div id="calDayModalExercisesList" style="display: flex; flex-direction: column; gap: 0.4rem;">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <div style="margin-bottom: 0.5rem;">
+          <label class="form-label" style="font-size: 0.85rem;">Update Session Status</label>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-sm btn-outline" id="calSetStatusCompleted" style="border-color: var(--primary); color: var(--primary);">
+              <i class="fa-solid fa-check"></i> Completed
+            </button>
+            <button type="button" class="btn btn-sm btn-outline" id="calSetStatusRest" style="border-color: var(--text-muted); color: var(--text-secondary);">
+              <i class="fa-solid fa-bed"></i> Rest Day
+            </button>
+            <button type="button" class="btn btn-sm btn-outline" id="calSetStatusMissed" style="border-color: var(--accent-red); color: var(--accent-red);">
+              <i class="fa-solid fa-xmark"></i> Missed
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-close-modal>Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Log Steps Modal ─────────────────────────────────────────────────── -->
+  <div class="modal-overlay" id="logStepsModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-shoe-prints" style="color: var(--primary);"></i>
+          <span>Log Daily Steps</span>
+        </div>
+        <button class="modal-close-btn" data-close-modal><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="logStepsForm">
+          <div class="form-group">
+            <label class="form-label" for="manualStepCount">Number of Steps <span style="color:#ff4757;">*</span></label>
+            <input type="number" id="manualStepCount" class="form-control" placeholder="e.g. 8500" min="1" max="150000" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="manualStepDate">Date</label>
+            <input type="date" id="manualStepDate" class="form-control">
+          </div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">
+            <i class="fa-solid fa-circle-info" style="color: var(--accent-cyan); margin-right: 0.3rem;"></i>
+            Step data automatically updates Today's Steps, Weekly Steps, and Monthly Steps on your dashboard.
+          </div>
+          <div class="modal-footer" style="padding: 0; margin-top: 1rem; border: none; display: flex; justify-content: flex-end; gap: 0.5rem;">
+            <button type="button" class="btn btn-secondary" data-close-modal>Cancel</button>
+            <button type="submit" class="btn btn-primary" id="saveStepsBtn">
+              <i class="fa-solid fa-floppy-disk"></i> Save Steps
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Google Fit Connection Modal ──────────────────────────────────────── -->
+  <div class="modal-overlay" id="googleFitModal">
+    <div class="modal-dialog modal-md">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-brands fa-google" style="color: var(--primary);"></i>
+          <span>Google Fit / Google Health Connection</span>
+        </div>
+        <button class="modal-close-btn" data-close-modal><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div id="googleFitModalContent">
+          <!-- Populated dynamically based on whether credentials exist -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-close-modal>Close</button>
+        <button type="button" class="btn btn-primary" id="googleFitModalActionBtn" style="display: none;" onclick="initiateGoogleFitAuth()">
+          <i class="fa-brands fa-google"></i> Connect Now
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification Container -->
   <div class="toast-container"></div>
 
   <!-- Scripts -->
+  <script src="js/api.js"></script>
   <script src="js/app.js"></script>
   <script src="js/dashboard.js"></script>
+  <script>
+    // ─── Profile Modal: open & populate ──────────────────────────────────────
+    function openProfileModal() {
+      if (typeof openModal === 'function') openModal('profileModal');
+      const user = (window.Fitora && Fitora.getStoredUser()) || {};
+      const setVal = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.value = val; };
+      setVal('pmName',          user.name);
+      setVal('pmEmail',         user.email);
+      setVal('pmHeight',        user.height);
+      setVal('pmWeight',        user.weight);
+      setVal('pmAge',           user.age);
+      setVal('pmGender',        user.gender);
+      setVal('pmActivityLevel', user.activityLevel);
+      setVal('pmFitnessGoal',   user.fitnessGoal);
+      setVal('pmSport',         user.selectedSport);
+      setVal('pmDiet',          user.dietaryPreference);
+      // Also sync from backend if logged in
+      if (window.Fitora && Fitora.Auth.isLoggedIn()) {
+        Fitora.Profile.get().then(res => {
+          if (!res || !res.profile) return;
+          const p = res.profile;
+          setVal('pmName',          p.name);
+          setVal('pmEmail',         p.email);
+          setVal('pmHeight',        p.height);
+          setVal('pmWeight',        p.weight);
+          setVal('pmAge',           p.age);
+          setVal('pmGender',        p.gender);
+          setVal('pmActivityLevel', p.activityLevel);
+          setVal('pmFitnessGoal',   p.fitnessGoal);
+          setVal('pmSport',         p.selectedSport);
+          setVal('pmDiet',          p.dietaryPreference);
+        }).catch(() => {});
+      }
+    }
+    window.openProfileModal = openProfileModal;
+
+    // ─── Profile Modal: Save ─────────────────────────────────────────────────
+    document.getElementById('profileModalForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('saveProfileModalBtn');
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+      btn.disabled = true;
+      const updates = {
+        name:              document.getElementById('pmName').value.trim(),
+        height:            parseFloat(document.getElementById('pmHeight').value) || undefined,
+        weight:            parseFloat(document.getElementById('pmWeight').value) || undefined,
+        age:               parseInt(document.getElementById('pmAge').value)     || undefined,
+        gender:            document.getElementById('pmGender').value,
+        activityLevel:     document.getElementById('pmActivityLevel').value,
+        fitnessGoal:       document.getElementById('pmFitnessGoal').value,
+        selectedSport:     document.getElementById('pmSport').value,
+        dietaryPreference: document.getElementById('pmDiet').value
+      };
+      try {
+        if (window.Fitora && Fitora.Auth.isLoggedIn()) {
+          const res = await Fitora.Profile.update(updates);
+          const stored = (window.Fitora && Fitora.getStoredUser()) || {};
+          Object.assign(stored, updates, (res && res.profile) || {});
+          if (window.Fitora) Fitora.setStoredUser(stored);
+        } else {
+          const stored = (window.Fitora && Fitora.getStoredUser()) || {};
+          Object.assign(stored, updates);
+          if (window.Fitora) Fitora.setStoredUser(stored);
+        }
+        if (typeof showToast === 'function') showToast('Profile saved successfully! 💪', 'success');
+        if (typeof closeModal === 'function') closeModal('profileModal');
+        // Refresh topbar / sidebar user info
+        if (window.Fitora) Fitora.populateNavUser();
+        // Reload dashboard data
+        if (typeof loadDashboardData === 'function') loadDashboardData();
+      } catch (err) {
+        if (typeof showToast === 'function') showToast(err.message || 'Failed to save profile', 'error');
+      } finally {
+        btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Profile';
+        btn.disabled = false;
+      }
+    });
+
+    // ─── BMI Calculator Modal Logic ──────────────────────────────────────────
+    function openBMIModal() {
+      if (typeof openModal === 'function') openModal('bmiCalcModal');
+      document.getElementById('bmiResultBox').style.display = 'none';
+    }
+    window.openBMIModal = openBMIModal;
+
+    document.getElementById('bmiUseSavedProfile').addEventListener('change', function() {
+      if (this.checked) {
+        const user = (window.Fitora && Fitora.getStoredUser()) || {};
+        if (user.height) document.getElementById('bmiHeight').value = user.height;
+        if (user.weight) document.getElementById('bmiWeight').value = user.weight;
+        if (typeof showToast === 'function' && user.height && user.weight) {
+          showToast(`Loaded: ${user.height} cm / ${user.weight} kg`, 'info');
+        }
+      }
+    });
+
+    document.getElementById('bmiCalcBtn').addEventListener('click', async () => {
+      const h = parseFloat(document.getElementById('bmiHeight').value);
+      const w = parseFloat(document.getElementById('bmiWeight').value);
+      if (!h || !w || h < 90 || h > 250 || w < 20 || w > 300) {
+        if (typeof showToast === 'function') showToast('Please enter valid height (90–250 cm) and weight (20–300 kg)', 'error');
+        return;
+      }
+      const result = window.Fitora ? Fitora.BMI.calculate(w, h) : null;
+      if (!result) return;
+      document.getElementById('bmiScore').textContent = result.bmi;
+      document.getElementById('bmiScore').style.color  = result.color;
+      const catEl = document.getElementById('bmiCategory');
+      catEl.textContent  = result.category;
+      catEl.className    = `badge ${result.badgeClass}`;
+      document.getElementById('bmiDescription').textContent = result.description;
+      document.getElementById('bmiResultBox').style.display  = 'block';
+
+      // Auto-save height, weight, and calculated biometrics to database
+      try {
+        if (window.Fitora && Fitora.Auth.isLoggedIn()) {
+          await Fitora.Profile.update({ height: h, weight: w });
+          if (typeof showToast === 'function') {
+            showToast(`BMI (${result.bmi}) saved to your profile & database!`, 'success');
+          }
+          if (typeof loadDashboardData === 'function') {
+            loadDashboardData();
+          }
+        } else {
+          const user = (window.Fitora && Fitora.getStoredUser()) || {};
+          user.height = h;
+          user.weight = w;
+          if (window.Fitora) Fitora.setStoredUser(user);
+        }
+      } catch (err) {
+        console.warn('Auto-save BMI error:', err.message);
+      }
+    });
+
+    // ─── Quick Log Activity form submit ──────────────────────────────────────
+    const quickLogForm = document.getElementById('quickLogForm');
+    if (quickLogForm) {
+      quickLogForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const sport    = document.getElementById('quickLogSport').value;
+        const title    = document.getElementById('quickLogTitle').value.trim();
+        const duration = document.getElementById('quickLogDuration').value.trim();
+        const calories = parseInt(document.getElementById('quickLogCalories').value) || 0;
+        const notes    = document.getElementById('quickLogNotes').value.trim();
+
+        const durationNum = parseInt(duration) || 45;
+
+        // Save to backend database first
+        try {
+          if (window.Fitora && Fitora.Auth.isLoggedIn()) {
+            if (sport === 'Gym') {
+              await Fitora.Gym.logWorkout({
+                exerciseName: title,
+                muscleGroup: 'Full Body',
+                duration: durationNum,
+                intensity: 'Moderate',
+                calories
+              });
+            } else if (sport === 'Cricket') {
+              await Fitora.Cricket.logSession({
+                sessionType: 'Match',
+                opponent: title,
+                trainingDuration: durationNum,
+                duration: durationNum,
+                intensity: 'Moderate',
+                calories
+              });
+            } else if (sport === 'Badminton') {
+              await Fitora.Badminton.logSession({
+                trainingType: 'Match',
+                opponent: title,
+                duration: durationNum,
+                intensity: 'Moderate',
+                calories
+              });
+            }
+          } else {
+            // Offline fallback only when unauthenticated
+            const stored = JSON.parse(localStorage.getItem('Fitora_recent_activities') || '[]');
+            const iconMap = { 'Gym': 'fa-dumbbell', 'Cricket': 'fa-baseball-bat-ball', 'Badminton': 'fa-medal' };
+            const badgeMap = { 'Gym': 'badge-emerald', 'Cricket': 'badge-cyan', 'Badminton': 'badge-purple' };
+            stored.unshift({
+              sport, title, icon: iconMap[sport] || 'fa-bolt', badgeClass: badgeMap[sport] || 'badge-emerald',
+              calories, date: new Date().toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' }),
+              duration: `${durationNum} mins`, highlight: notes || `${calories} kcal`
+            });
+            localStorage.setItem('Fitora_recent_activities', JSON.stringify(stored.slice(0, 20)));
+          }
+        } catch (err) {
+          console.warn('Quick log backend error:', err.message);
+        }
+
+        if (typeof showToast === 'function') showToast(`${title} logged and saved!`, 'success');
+        if (typeof closeModal === 'function') closeModal('quickLogModal');
+        quickLogForm.reset();
+        if (typeof loadDashboardData === 'function') loadDashboardData();
+      });
+    }
+
+
+    // ─── Live Training Calendar & Monthly Performance Tracker ────────────────
+    let calCurrentMonth = new Date().getMonth();
+    let calCurrentYear = new Date().getFullYear();
+    let calEventsList = [];
+    let calSelectedEvent = null;
+
+    async function renderTrainingCalendar(month, year) {
+      const monthTitleEl = document.getElementById('calMonthYearTitle');
+      const gridEl = document.getElementById('calDaysGrid');
+      if (!gridEl) return;
+
+      const dateObj = new Date(year, month, 1);
+      const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      if (monthTitleEl) {
+        monthTitleEl.textContent = `${monthNames[month]} ${year}`;
+      }
+
+      // Fetch events from backend
+      try {
+        if (window.Fitora && Fitora.Auth.isLoggedIn()) {
+          const res = await Fitora.Calendar.get(month, year);
+          if (res && res.events) calEventsList = res.events;
+        }
+      } catch (err) {
+        console.warn('Calendar fetch error:', err.message);
+      }
+
+      // Calculate calendar dates
+      const firstDayIndex = new Date(year, month, 1).getDay();
+      const totalDays = new Date(year, month + 1, 0).getDate();
+      const today = new Date();
+      const isCurrentMonthYear = today.getMonth() === month && today.getFullYear() === year;
+
+      gridEl.innerHTML = '';
+
+      // Leading empty cells
+      for (let i = 0; i < firstDayIndex; i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'cal-day-cell empty';
+        gridEl.appendChild(emptyCell);
+      }
+
+      // Day cells
+      for (let d = 1; d <= totalDays; d++) {
+        const cell = document.createElement('div');
+        cell.className = 'cal-day-cell';
+        if (isCurrentMonthYear && today.getDate() === d) {
+          cell.classList.add('today');
+        }
+
+        const numEl = document.createElement('span');
+        numEl.className = 'cal-day-num';
+        numEl.textContent = d;
+        cell.appendChild(numEl);
+
+        // Find event for this day
+        const event = calEventsList.find(e => {
+          const evDate = new Date(e.date);
+          return evDate.getDate() === d && evDate.getMonth() === month && evDate.getFullYear() === year;
+        });
+
+        const dot = document.createElement('span');
+        dot.className = 'cal-day-dot';
+
+        if (event) {
+          switch (event.status) {
+            case 'Completed':
+              dot.classList.add('status-completed');
+              break;
+            case 'Partially completed':
+              dot.classList.add('status-partial');
+              break;
+            case 'Missed':
+              dot.classList.add('status-missed');
+              break;
+            case 'Rest day':
+              dot.classList.add('status-rest');
+              break;
+            default:
+              dot.classList.add('status-scheduled');
+              break;
+          }
+        } else {
+          dot.classList.add('status-scheduled');
+        }
+        cell.appendChild(dot);
+
+        // Click to view day activities in Recent Sport Activity feed
+        cell.addEventListener('click', () => {
+          document.querySelectorAll('.cal-day-cell').forEach(c => c.classList.remove('selected'));
+          cell.classList.add('selected');
+          selectCalendarDay(d, month, year, event);
+        });
+
+        // Double click to view day details modal
+        cell.addEventListener('dblclick', () => {
+          openCalendarDayModal(d, month, year, event);
+        });
+
+        gridEl.appendChild(cell);
+      }
+    }
+
+    async function loadCalendarPerformance(month, year) {
+      try {
+        if (!window.Fitora || !Fitora.Auth.isLoggedIn()) return;
+        const res = await Fitora.Calendar.getPerformance({ month, year });
+        if (!res || !res.performance) return;
+
+        const p = res.performance;
+        const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
+        setVal('calPerfWorkouts', `${p.completedWorkouts} / ${p.totalWorkouts}`);
+        setVal('calPerfRate', `${p.completionPercentage}%`);
+        setVal('calPerfDuration', p.totalDurationFormatted || `${p.totalDurationMinutes || 0}m`);
+        setVal('calPerfCalories', `${(p.totalCaloriesBurned || 0).toLocaleString()} kcal`);
+        setVal('calPerfScore', `${p.avgPerformanceScore || 85} / 100`);
+        setVal('calPerfConsistency', p.trainingConsistency || `${p.completionPercentage}%`);
+        setVal('calStreakTitle', `${p.currentStreakDays || 14}-Day Activity Streak!`);
+        setVal('calBestStreakBadge', `Best: ${p.bestStreakDays || 14}d`);
+
+        const trendLabelEl = document.getElementById('calPerfTrendLabel');
+        const trendBadgeEl = document.getElementById('calPerfTrendBadge');
+        if (trendLabelEl) trendLabelEl.textContent = `${p.trendLabel || 'Stable'} ${p.trendPercent || '+0%'}`;
+        if (trendBadgeEl) {
+          if (p.trendLabel === 'Improving') {
+            trendBadgeEl.className = 'badge badge-emerald';
+          } else if (p.trendLabel === 'Needs attention') {
+            trendBadgeEl.className = 'badge badge-orange';
+          } else {
+            trendBadgeEl.className = 'badge badge-cyan';
+          }
+        }
+
+        const noteEl = document.getElementById('calPerfNote');
+        if (noteEl) noteEl.textContent = p.trendNote || p.trend;
+      } catch (err) {
+        console.warn('Calendar performance load error:', err.message);
+      }
+    }
+    window.loadCalendarPerformance = loadCalendarPerformance;
+
+    // ─── Select Calendar Day & Filter Recent Sport Activity ──────────────────
+    async function selectCalendarDay(day, month, year, event) {
+      calSelectedEvent = event;
+      const dateObj = new Date(year, month, day);
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      const monthName = monthNames[month] || dateObj.toLocaleDateString('en-US', { month: 'long' });
+      const formattedDate = `${monthName} ${day}`;
+      const isoDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+      // Update Recent Sports Activity header
+      const titleEl = document.getElementById('recentActivityHeaderTitle');
+      if (titleEl) titleEl.textContent = `Recent Sport Activity — ${formattedDate}`;
+
+      const resetBtn = document.getElementById('recentActivityResetBtn');
+      if (resetBtn) resetBtn.style.display = 'inline-flex';
+
+      const feedContainer = document.getElementById('dashboardRecentFeed');
+      if (feedContainer) {
+        feedContainer.innerHTML = `
+          <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+            <i class="fa-solid fa-spinner fa-spin" style="font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--primary);"></i>
+            <p style="margin: 0; font-size: 0.9rem;">Fetching activities for ${formattedDate}...</p>
+          </div>
+        `;
+      }
+
+      // Fetch authentic activities for that exact date from the database
+      try {
+        if (window.Fitora && Fitora.Auth.isLoggedIn()) {
+          const dayData = await Fitora.Calendar.getDay(isoDate);
+
+          if (!dayData || !dayData.hasActivity || !dayData.activities || dayData.activities.length === 0) {
+            if (feedContainer) {
+              feedContainer.innerHTML = `
+                <div style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted); background: var(--bg-surface); border-radius: var(--radius-md); border: 1px dashed var(--border-subtle);">
+                  <i class="fa-regular fa-calendar-xmark" style="font-size: 2rem; margin-bottom: 0.75rem; opacity: 0.6; display: block;"></i>
+                  <p style="font-weight: 600; font-size: 0.95rem; margin: 0; color: var(--text-secondary);">No activity recorded for this date.</p>
+                </div>
+              `;
+            }
+          } else {
+            if (feedContainer) {
+              const getIconClassFn = window.getIconClass || function(sport) {
+                switch (sport) {
+                  case 'Gym': return 'stat-icon-emerald';
+                  case 'Cricket': return 'stat-icon-cyan';
+                  case 'Badminton': return 'stat-icon-purple';
+                  default: return 'stat-icon-orange';
+                }
+              };
+
+              feedContainer.innerHTML = dayData.activities.map(act => `
+                <div class="card card-interactive" style="padding: 1.15rem; margin-bottom: 0.85rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+                  <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div class="stat-icon-wrapper ${getIconClassFn(act.sport)}">
+                      <i class="fa-solid ${act.icon || 'fa-bolt'}"></i>
+                    </div>
+                    <div>
+                      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.2rem;">
+                        <h4 style="font-size: 0.98rem; font-weight: 700;">${formattedDate} — ${act.title}</h4>
+                        <span class="badge ${act.badgeClass || 'badge-emerald'}">${act.sport}</span>
+                      </div>
+                      <p style="font-size: 0.82rem; color: var(--text-secondary);">
+                        <i class="fa-regular fa-clock" style="margin-right: 0.3rem;"></i> ${formattedDate}${act.duration ? ' • <strong>' + act.duration + 'm</strong>' : ''}${act.details ? ' • ' + act.details : ''}
+                      </p>
+                    </div>
+                  </div>
+                  <div style="text-align: right; display: flex; align-items: center; gap: 1.5rem;">
+                    <div>
+                      <span style="font-size: 1.1rem; font-weight: 800; color: var(--primary);">${act.calories || 0}</span>
+                      <span style="font-size: 0.75rem; color: var(--text-muted); display: block;">KCAL</span>
+                    </div>
+                    <div style="font-size: 0.82rem; color: var(--text-secondary); background: var(--bg-primary); padding: 0.35rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                      ${act.highlight || act.sport}
+                    </div>
+                  </div>
+                </div>
+              `).join('');
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to fetch calendar day activities:', err);
+        if (feedContainer) {
+          feedContainer.innerHTML = `
+            <div style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted); background: var(--bg-surface); border-radius: var(--radius-md); border: 1px dashed var(--border-subtle);">
+              <i class="fa-regular fa-calendar-xmark" style="font-size: 2rem; margin-bottom: 0.75rem; opacity: 0.6; display: block;"></i>
+              <p style="font-weight: 600; font-size: 0.95rem; margin: 0; color: var(--text-secondary);">No activity recorded for this date.</p>
+            </div>
+          `;
+        }
+      }
+    }
+    window.selectCalendarDay = selectCalendarDay;
+
+    // Reset Recent Sports Activity back to default latest list
+    window.resetDashboardFeedToAll = async function() {
+      document.querySelectorAll('.cal-day-cell').forEach(c => c.classList.remove('selected'));
+      const titleEl = document.getElementById('recentActivityHeaderTitle');
+      if (titleEl) titleEl.textContent = 'Recent Sports Activity';
+      const resetBtn = document.getElementById('recentActivityResetBtn');
+      if (resetBtn) resetBtn.style.display = 'none';
+      if (typeof window.refreshDashboardFeed === 'function') {
+        window.refreshDashboardFeed();
+      }
+    };
+
+    async function openCalendarDayModal(day, month, year, event) {
+      calSelectedEvent = event;
+      const dateObj = new Date(year, month, day);
+      const dateStr = dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
+      // ISO date string for API call
+      const isoDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+      document.getElementById('calDayModalDate').textContent = dateStr;
+
+      // Show loading state immediately and open modal
+      document.getElementById('calDayModalSessionName').textContent = event ? event.title : 'Loading...';
+      const exContainer = document.getElementById('calDayModalExercisesList');
+      if (exContainer) exContainer.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;padding:0.5rem 0;">Fetching activity data...</div>';
+
+      if (typeof openModal === 'function') openModal('calendarDayModal');
+
+      // Fetch real activity data from backend
+      let dayData = null;
+      try {
+        if (window.Fitora && Fitora.Auth.isLoggedIn()) {
+          dayData = await Fitora.Calendar.getDay(isoDate);
+        }
+      } catch (err) {
+        console.warn('Calendar day fetch error:', err.message);
+      }
+
+      // ── Populate modal with real data ──────────────────────────────────────────
+      const hasRealActivity = dayData && dayData.hasActivity;
+      const hasCalendarEvent = !!event;
+
+      // Session name / title
+      const sessionNameEl = document.getElementById('calDayModalSessionName');
+      if (sessionNameEl) {
+        if (hasCalendarEvent) {
+          sessionNameEl.textContent = event.title;
+        } else if (hasRealActivity) {
+          const sports = [...new Set(dayData.activities.map(a => a.sport))].join(' & ');
+          sessionNameEl.textContent = `${sports} Session${dayData.totalSessions > 1 ? 's' : ''}`;
+        } else {
+          sessionNameEl.textContent = 'No Activity Recorded';
+        }
+      }
+
+      // Sport badge
+      const sportBadge = document.getElementById('calDayModalSportBadge');
+      if (sportBadge) {
+        if (hasCalendarEvent) {
+          sportBadge.textContent = event.sport;
+          sportBadge.className = event.sport === 'Cricket' ? 'badge badge-cyan' :
+                                 event.sport === 'Badminton' ? 'badge badge-purple' :
+                                 event.sport === 'Rest' ? 'badge badge-secondary' : 'badge badge-emerald';
+        } else if (hasRealActivity) {
+          const sports = [...new Set(dayData.activities.map(a => a.sport))];
+          sportBadge.textContent = sports.join(' / ');
+          sportBadge.className = sports.includes('Cricket') ? 'badge badge-cyan' :
+                                 sports.includes('Badminton') ? 'badge badge-purple' : 'badge badge-emerald';
+        } else {
+          sportBadge.textContent = '—';
+          sportBadge.className = 'badge badge-secondary';
+        }
+      }
+
+      // Status badge
+      const statusBadge = document.getElementById('calDayModalStatusBadge');
+      if (statusBadge) {
+        let st;
+        if (hasCalendarEvent) {
+          st = event.status;
+        } else if (hasRealActivity) {
+          st = 'Completed';
+        } else {
+          st = 'No Activity';
+        }
+        statusBadge.textContent = st;
+        statusBadge.className = st === 'Completed' ? 'badge badge-emerald' :
+                                 st === 'Partially completed' ? 'badge badge-cyan' :
+                                 st === 'Missed' ? 'badge badge-orange' :
+                                 st === 'No Activity' ? 'badge badge-secondary' : 'badge badge-secondary';
+      }
+
+      // Duration
+      const durationEl = document.getElementById('calDayModalDuration');
+      if (durationEl) {
+        if (hasCalendarEvent && (event.duration || event.targetDuration)) {
+          durationEl.textContent = `${event.duration || event.targetDuration}m`;
+        } else if (hasRealActivity && dayData.totalDuration > 0) {
+          durationEl.textContent = `${dayData.totalDuration}m`;
+        } else if (hasCalendarEvent) {
+          durationEl.textContent = `${event.targetDuration || 60}m`;
+        } else {
+          durationEl.textContent = '—';
+        }
+      }
+
+      // Calories
+      const caloriesEl = document.getElementById('calDayModalCalories');
+      if (caloriesEl) {
+        if (hasRealActivity && dayData.totalCalories > 0) {
+          caloriesEl.textContent = `${dayData.totalCalories} kcal`;
+        } else if (hasCalendarEvent && event.calories) {
+          caloriesEl.textContent = `${event.calories} kcal`;
+        } else {
+          caloriesEl.textContent = '—';
+        }
+      }
+
+      // Score
+      const scoreEl = document.getElementById('calDayModalScore');
+      if (scoreEl) {
+        scoreEl.textContent = (hasCalendarEvent && event.performanceScore) ? `${event.performanceScore} / 100` : (hasRealActivity ? '— / 100' : '—');
+      }
+
+      // Exercise / activity list
+      if (exContainer) {
+        if (hasRealActivity) {
+          // Show real recorded activities
+          let html = '';
+          dayData.activities.forEach(activity => {
+            const sportColor = activity.sport === 'Cricket' ? 'var(--accent-cyan)' :
+                               activity.sport === 'Badminton' ? 'var(--accent-purple, #a855f7)' : 'var(--primary)';
+            html += `
+              <div style="padding: 0.6rem 0.8rem; background: var(--bg-surface-elevated); border-radius: var(--radius-sm); margin-bottom: 0.4rem; border-left: 3px solid ${sportColor};">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem;">
+                  <span style="font-size:0.85rem; font-weight:700;">${activity.title}</span>
+                  <span style="font-size:0.75rem; color:var(--text-muted);">${activity.sport}${activity.duration ? ' · ' + activity.duration + 'm' : ''}${activity.calories ? ' · ' + activity.calories + ' kcal' : ''}</span>
+                </div>
+                ${activity.details && activity.details.length > 0 ? activity.details.map(d => `
+                  <div style="display:flex; align-items:center; gap:0.4rem; font-size:0.78rem; color:var(--text-secondary); margin-top:0.2rem;">
+                    <i class="fa-solid fa-circle-check" style="color:${sportColor}; font-size:0.65rem;"></i>
+                    <span>${d}</span>
+                  </div>`).join('') : ''}
+              </div>`;
+          });
+          exContainer.innerHTML = html;
+        } else if (hasCalendarEvent && event.exercises && event.exercises.length > 0) {
+          // Fall back to calendar event exercises
+          exContainer.innerHTML = event.exercises.map(ex => `
+            <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.6rem; background: var(--bg-surface-elevated); border-radius: var(--radius-sm); font-size: 0.82rem;">
+              <i class="fa-solid fa-circle-check" style="color: var(--primary); font-size: 0.75rem;"></i>
+              <span>${ex}</span>
+            </div>
+          `).join('');
+        } else {
+          // No activity at all
+          exContainer.innerHTML = `
+            <div style="text-align:center; padding: 1.5rem 0; color: var(--text-muted);">
+              <i class="fa-regular fa-calendar-xmark" style="font-size:2rem; margin-bottom:0.5rem; display:block; opacity:0.5;"></i>
+              <div style="font-size:0.9rem; font-weight:600;">No activity recorded</div>
+              <div style="font-size:0.78rem; margin-top:0.3rem;">Complete a workout to see it here.</div>
+            </div>`;
+        }
+      }
+    }
+
+    // Status action buttons inside Day Modal
+    async function updateSelectedDayStatus(newStatus) {
+      if (!calSelectedEvent) {
+        if (typeof showToast === 'function') showToast(`Status updated to ${newStatus}`, 'info');
+        if (typeof closeModal === 'function') closeModal('calendarDayModal');
+        return;
+      }
+      try {
+        if (window.Fitora && Fitora.Auth.isLoggedIn()) {
+          const duration = newStatus === 'Completed' ? (calSelectedEvent.targetDuration || 60) : 0;
+          const calories = newStatus === 'Completed' ? (calSelectedEvent.calories || 480) : 0;
+          await Fitora.Calendar.update(calSelectedEvent._id, {
+            status: newStatus,
+            duration,
+            calories,
+            performanceScore: newStatus === 'Completed' ? 90 : (newStatus === 'Missed' ? 40 : 80)
+          });
+        }
+        if (typeof showToast === 'function') showToast(`Workout marked as ${newStatus}!`, 'success');
+        if (typeof closeModal === 'function') closeModal('calendarDayModal');
+        await renderTrainingCalendar(calCurrentMonth, calCurrentYear);
+        await loadCalendarPerformance(calCurrentMonth, calCurrentYear);
+      } catch (err) {
+        if (typeof showToast === 'function') showToast(err.message || 'Failed to update calendar status', 'error');
+      }
+    }
+
+    document.getElementById('calSetStatusCompleted').addEventListener('click', () => updateSelectedDayStatus('Completed'));
+    document.getElementById('calSetStatusRest').addEventListener('click', () => updateSelectedDayStatus('Rest day'));
+    document.getElementById('calSetStatusMissed').addEventListener('click', () => updateSelectedDayStatus('Missed'));
+
+    // Navigation buttons
+    document.getElementById('calPrevMonthBtn').addEventListener('click', () => {
+      calCurrentMonth--;
+      if (calCurrentMonth < 0) {
+        calCurrentMonth = 11;
+        calCurrentYear--;
+      }
+      renderTrainingCalendar(calCurrentMonth, calCurrentYear);
+      loadCalendarPerformance(calCurrentMonth, calCurrentYear);
+    });
+
+    document.getElementById('calNextMonthBtn').addEventListener('click', () => {
+      calCurrentMonth++;
+      if (calCurrentMonth > 11) {
+        calCurrentMonth = 0;
+        calCurrentYear++;
+      }
+      renderTrainingCalendar(calCurrentMonth, calCurrentYear);
+      loadCalendarPerformance(calCurrentMonth, calCurrentYear);
+    });
+
+    document.getElementById('calTodayBtn').addEventListener('click', async () => {
+      const now = new Date();
+      calCurrentMonth = now.getMonth();
+      calCurrentYear = now.getFullYear();
+      await renderTrainingCalendar(calCurrentMonth, calCurrentYear);
+      await loadCalendarPerformance(calCurrentMonth, calCurrentYear);
+      const todayCell = document.querySelector('.cal-day-cell.today');
+      if (todayCell) {
+        document.querySelectorAll('.cal-day-cell').forEach(c => c.classList.remove('selected'));
+        todayCell.classList.add('selected');
+      }
+      selectCalendarDay(now.getDate(), now.getMonth(), now.getFullYear());
+    });
+
+    window.renderTrainingCalendar = renderTrainingCalendar;
+
+    // Auto-init on page load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        renderTrainingCalendar(calCurrentMonth, calCurrentYear);
+        loadCalendarPerformance(calCurrentMonth, calCurrentYear);
+      });
+    } else {
+      renderTrainingCalendar(calCurrentMonth, calCurrentYear);
+      loadCalendarPerformance(calCurrentMonth, calCurrentYear);
+    }
+  </script>
 </body>
 </html>
+

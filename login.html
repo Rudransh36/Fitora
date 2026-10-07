@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PulseFit - Athlete Sign In | Sports & Fitness Monitoring</title>
+  <title>Fitora - Athlete Sign In | Sports & Fitness Monitoring</title>
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,7 +32,7 @@
           <div class="brand-icon">
             <i class="fa-solid fa-heart-pulse"></i>
           </div>
-          <div class="brand-text">PULSE<span>FIT</span></div>
+          <div class="brand-text">FIT<span>ORA</span></div>
         </div>
 
         <h1 class="showcase-title">
@@ -67,17 +67,17 @@
           <div class="brand-icon">
             <i class="fa-solid fa-heart-pulse"></i>
           </div>
-          <div class="brand-text">PULSE<span>FIT</span></div>
+          <div class="brand-text">FIT<span>ORA</span></div>
         </div>
         <h2>Welcome Back</h2>
-        <p>New to PulseFit? <a href="register.html">Create an athlete account</a></p>
+        <p>New to Fitora? <a href="register.html">Create an athlete account</a></p>
       </div>
 
       <!-- Quick 1-Click Demo Login Helper -->
       <div class="demo-account-box">
         <div class="demo-account-text">
           <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary); margin-right: 0.35rem;"></i>
-          Demo: <strong>alex@pulsefit.io</strong>
+          Demo: <strong>alex@Fitora.io</strong>
         </div>
         <button type="button" class="btn btn-secondary btn-sm" id="fillDemoCredsBtn">
           1-Click Autofill
@@ -86,10 +86,10 @@
 
       <!-- Social Logins -->
       <div class="social-login-grid">
-        <button type="button" class="social-btn" onclick="simulateSocialLogin('Google')">
+        <button type="button" class="social-btn" onclick="handleSocialAuth('Google')">
           <i class="fa-brands fa-google" style="color: #ea4335;"></i> Google
         </button>
-        <button type="button" class="social-btn" onclick="simulateSocialLogin('Apple')">
+        <button type="button" class="social-btn" onclick="handleSocialAuth('Apple')">
           <i class="fa-brands fa-apple"></i> Apple
         </button>
       </div>
@@ -102,7 +102,7 @@
           <label class="form-label" for="loginEmail">Email or Username</label>
           <div class="input-wrapper">
             <i class="fa-regular fa-envelope input-icon-left"></i>
-            <input type="text" id="loginEmail" class="form-control has-icon-left" placeholder="e.g. alex@pulsefit.io" required>
+            <input type="text" id="loginEmail" class="form-control has-icon-left" placeholder="e.g. alex@Fitora.io" required>
           </div>
         </div>
 
@@ -153,7 +153,7 @@
           </p>
           <div class="form-group">
             <label class="form-label">Email Address</label>
-            <input type="email" class="form-control" placeholder="alex@pulsefit.io" required id="forgotEmail">
+            <input type="email" class="form-control" placeholder="alex@Fitora.io" required id="forgotEmail">
           </div>
         </div>
         <div class="modal-footer">
@@ -164,12 +164,82 @@
     </div>
   </div>
 
+  <!-- OAuth Setup Guidance Modal -->
+  <div class="modal-overlay" id="oauthModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title" id="oauthModalTitle">
+          <i class="fa-brands fa-google" style="color: #ea4335;"></i> OAuth Configuration Notice
+        </div>
+        <button class="modal-close-btn" data-close-modal>
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="oauthModalMsg" style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5; margin-bottom: 1rem;">
+          To activate direct social login in your environment, configure the OAuth credentials in your backend configuration file.
+        </p>
+        <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0.85rem; font-family: monospace; font-size: 0.82rem; margin-bottom: 1rem; color: var(--accent-cyan);" id="oauthModalCode">
+          GOOGLE_CLIENT_ID=your_client_id_here<br>
+          GOOGLE_CLIENT_SECRET=your_client_secret_here<br>
+          GOOGLE_CALLBACK_URL=http://localhost:5000/api/auth/google/callback
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+          <i class="fa-solid fa-shield-halved" style="color: var(--primary);"></i> In accordance with security standards, credentials are stored securely via environment variables and never exposed in client source code.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-close-modal>Understood</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification Container -->
   <div class="toast-container"></div>
 
   <!-- Scripts -->
+  <script src="js/api.js"></script>
   <script src="js/app.js"></script>
   <script>
+    // ─── OAuth Callback Handler ──────────────────────────────────────────────
+    const urlParams = new URLSearchParams(window.location.search);
+    const oauthToken = urlParams.get('token');
+    const oauthError = urlParams.get('error');
+
+    if (oauthError) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+      if (typeof showToast === 'function') {
+        showToast(decodeURIComponent(oauthError), 'error', 'Google Sign-In Failed');
+      } else if (window.Fitora && typeof Fitora.showToast === 'function') {
+        Fitora.showToast(decodeURIComponent(oauthError), 'error');
+      }
+    } else if (oauthToken) {
+      // 1. Store token using existing mechanism
+      if (window.Fitora && typeof Fitora.setToken === 'function') {
+        Fitora.setToken(oauthToken);
+      } else {
+        localStorage.setItem('Fitora_token', oauthToken);
+      }
+      // 2. Remove token from URL immediately
+      window.history.replaceState({}, document.title, window.location.pathname);
+      // 3. Fetch/restore user using /api/auth/me, store user & redirect to dashboard
+      (async () => {
+        try {
+          if (window.Fitora && Fitora.Auth && typeof Fitora.Auth.getMe === 'function') {
+            const res = await Fitora.Auth.getMe();
+            if (res && res.user) {
+              Fitora.setStoredUser(res.user);
+            }
+          }
+        } catch (err) {
+          console.warn('OAuth getMe warning:', err);
+        }
+        window.location.href = 'index.html';
+      })();
+    } else if (window.Fitora && Fitora.Auth.isLoggedIn()) {
+      window.location.href = 'index.html';
+    }
+
     // Show mobile logo if screen is small
     if (window.innerWidth <= 900) {
       const mobileLogo = document.getElementById("mobileAuthLogo");
@@ -178,42 +248,85 @@
 
     // Toggle Password Visibility
     const toggleBtn = document.getElementById("togglePasswordBtn");
-    const pwdInput = document.getElementById("loginPassword");
+    const pwdInput  = document.getElementById("loginPassword");
     toggleBtn.addEventListener("click", () => {
       const isPassword = pwdInput.type === "password";
       pwdInput.type = isPassword ? "text" : "password";
       toggleBtn.innerHTML = isPassword ? '<i class="fa-regular fa-eye-slash"></i>' : '<i class="fa-regular fa-eye"></i>';
     });
 
-    // 1-Click Demo Credentials
-    document.getElementById("fillDemoCredsBtn").addEventListener("click", () => {
-      document.getElementById("loginEmail").value = "alex@pulsefit.io";
-      document.getElementById("loginPassword").value = "athlete123";
-      showToast("Demo athlete credentials filled!", "info");
-    });
-
-    // Form Submit
-    document.getElementById("loginForm").addEventListener("submit", (e) => {
+    // Form Submit – real backend login
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const email = document.getElementById("loginEmail").value;
-      const btn = document.getElementById("signInSubmitBtn");
-      
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...';
-      btn.disabled = true;
+      const email    = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value;
+      const btn      = document.getElementById("signInSubmitBtn");
 
-      setTimeout(() => {
-        showToast("Welcome back, Alex! Redirecting to your fitness hub...", "success");
-        setTimeout(() => {
-          window.location.href = "index.html";
-        }, 800);
-      }, 700);
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...';
+      btn.disabled  = true;
+
+      try {
+        const data = await Fitora.Auth.login(email, password);
+        Fitora.showToast(data.message || 'Welcome back! 💪', 'success');
+        setTimeout(() => { window.location.href = 'index.html'; }, 700);
+      } catch (err) {
+        Fitora.showToast(err.message, 'error');
+        btn.innerHTML = '<span>Sign In to Dashboard</span><i class="fa-solid fa-arrow-right"></i>';
+        btn.disabled  = false;
+      }
     });
 
-    function simulateSocialLogin(provider) {
-      showToast(`Signing in with ${provider}...`, "info");
-      setTimeout(() => {
-        window.location.href = "index.html";
-      }, 900);
+    // 1-Click Demo: auto-create demo account if it doesn't exist
+    document.getElementById("fillDemoCredsBtn").addEventListener("click", async () => {
+      document.getElementById("loginEmail").value    = "alex@Fitora.io";
+      document.getElementById("loginPassword").value = "athlete123";
+      Fitora.showToast("Demo credentials filled! Click Sign In.", "info");
+    });
+
+    // Real OAuth check & guidance
+    async function handleSocialAuth(provider) {
+      if (provider === 'Google') {
+        try {
+          const status = await Fitora.Auth.getGoogleStatus();
+          if (status.configured) {
+            window.location.href = `${Fitora.API_BASE}/auth/google`;
+          } else {
+            showOAuthModal('Google', status.instructions || 'Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in backend/.env to activate live Google authentication.', 'GOOGLE_CLIENT_ID=your_google_client_id.apps.googleusercontent.com\nGOOGLE_CLIENT_SECRET=your_google_client_secret\nGOOGLE_CALLBACK_URL=http://localhost:5000/api/auth/google/callback');
+          }
+        } catch (err) {
+          showOAuthModal('Google', 'Backend authentication service is checking credentials. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in backend/.env.', 'GOOGLE_CLIENT_ID=your_google_client_id.apps.googleusercontent.com\nGOOGLE_CLIENT_SECRET=your_google_client_secret\nGOOGLE_CALLBACK_URL=http://localhost:5000/api/auth/google/callback');
+        }
+      } else if (provider === 'Apple') {
+        try {
+          const status = await Fitora.Auth.getAppleStatus();
+          if (status.configured) {
+            window.location.href = `${Fitora.API_BASE}/auth/apple`;
+          } else {
+            showOAuthModal('Apple', status.instructions || 'Set APPLE_CLIENT_ID and APPLE_TEAM_ID in backend/.env to activate live Apple Sign-In.', 'APPLE_CLIENT_ID=com.fitora.web.auth\nAPPLE_TEAM_ID=your_team_id\nAPPLE_KEY_ID=your_key_id');
+          }
+        } catch (err) {
+          showOAuthModal('Apple', 'Backend authentication service is checking credentials. Set APPLE_CLIENT_ID and APPLE_TEAM_ID in backend/.env.', 'APPLE_CLIENT_ID=com.fitora.web.auth\nAPPLE_TEAM_ID=your_team_id');
+        }
+      }
+    }
+
+    function showOAuthModal(provider, message, codeSnippet) {
+      const modal = document.getElementById("oauthModal");
+      const title = document.getElementById("oauthModalTitle");
+      const msg = document.getElementById("oauthModalMsg");
+      const code = document.getElementById("oauthModalCode");
+      if (title) {
+        title.innerHTML = provider === 'Google' 
+          ? '<i class="fa-brands fa-google" style="color: #ea4335;"></i> Google Sign-In Setup'
+          : '<i class="fa-brands fa-apple"></i> Apple Sign-In Setup';
+      }
+      if (msg) msg.textContent = message;
+      if (code) code.innerHTML = codeSnippet.replace(/\n/g, '<br>');
+      if (typeof openModal === 'function') {
+        openModal("oauthModal");
+      } else if (modal) {
+        modal.classList.add("active");
+      }
     }
 
     // Forgot password handler

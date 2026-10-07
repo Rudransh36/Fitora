@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PulseFit - Gym & Strength Training | Sports & Fitness Monitoring</title>
+  <title>Fitora - Gym & Strength Training | Sports & Fitness Monitoring</title>
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,7 +32,7 @@
           <div class="brand-icon">
             <i class="fa-solid fa-heart-pulse"></i>
           </div>
-          <div class="brand-text">PULSE<span>FIT</span></div>
+          <div class="brand-text">FIT<span>ORA</span></div>
         </a>
         <button class="sidebar-close-btn" aria-label="Close Sidebar">
           <i class="fa-solid fa-xmark"></i>
@@ -68,6 +68,13 @@
                 <i class="fa-solid fa-medal"></i>
                 <span>Badminton</span>
                 <span class="nav-badge" style="color: var(--primary);">Live</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="diet.html">
+                <i class="fa-solid fa-bowl-food"></i>
+                <span>Diet & Nutrition</span>
+                <span class="nav-badge" style="background: rgba(34, 197, 94, 0.15); color: #22c55e;">Indian</span>
               </a>
             </li>
           </ul>
@@ -138,9 +145,9 @@
             <span class="notification-badge"></span>
           </button>
 
-          <div class="user-profile-menu" onclick="window.location.href='login.html'">
-            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="User Profile" class="user-profile-avatar">
-            <span class="user-profile-label topbar-user-name">Alex Rivera</span>
+          <div class="user-profile-menu" title="Athlete Profile">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="User Profile" class="user-profile-avatar" id="topbarUserAvatar">
+            <span class="user-profile-label topbar-user-name" id="topbarUserName">Alex Rivera</span>
           </div>
         </div>
       </header>
@@ -164,7 +171,7 @@
             <button class="btn btn-outline" onclick="openModal('addExerciseModal')">
               <i class="fa-solid fa-plus"></i> Add Exercise
             </button>
-            <button class="btn btn-primary" onclick="showToast('Workout completed & logged to history! Volume: 6,480 kg', 'success', 'Session Finished')">
+            <button class="btn btn-primary" id="finishWorkoutBtn">
               <i class="fa-solid fa-check-double"></i> Finish Workout
             </button>
           </div>
@@ -182,6 +189,9 @@
             <p style="color: var(--text-secondary); font-size: 0.9rem;">
               Focus: Heavy compound pressing followed by tricep isolation.
             </p>
+            <button class="btn btn-sm btn-outline" id="viewPlanModalBtn" style="margin-top: 0.65rem; border-color: var(--primary); color: var(--primary);">
+              <i class="fa-solid fa-clipboard-list"></i> View Workout Plan & Exercise Checklist
+            </button>
           </div>
 
           <div style="display: flex; gap: 2rem; align-items: center; flex-wrap: wrap;">
@@ -191,21 +201,24 @@
             </div>
             <div>
               <span style="font-size: 0.75rem; color: var(--text-muted); display: block; text-transform: uppercase;">Active Duration</span>
-              <strong style="font-size: 1.5rem; font-weight: 800; color: var(--accent-cyan);">48 mins</strong>
+              <strong id="sessionDurationDisplay" style="font-size: 1.5rem; font-weight: 800; color: var(--accent-cyan);">48 mins</strong>
             </div>
             <div>
               <span style="font-size: 0.75rem; color: var(--text-muted); display: block; text-transform: uppercase;">Completed Sets</span>
-              <strong style="font-size: 1.5rem; font-weight: 800; color: #fff;">10 / 14</strong>
+              <strong id="completedSetsDisplay" style="font-size: 1.5rem; font-weight: 800; color: #fff;">10 / 14</strong>
             </div>
           </div>
         </section>
 
         <!-- Workout Routine Split Filters -->
-        <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 0.5rem;">
+        <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 0.5rem;">
           <button class="btn btn-sm btn-primary routine-select-pill active" data-routine="Push (Chest/Tri)">Push Day (Chest & Shoulders)</button>
           <button class="btn btn-sm btn-secondary routine-select-pill" data-routine="Pull (Back/Bi)">Pull Day (Back & Biceps)</button>
           <button class="btn btn-sm btn-secondary routine-select-pill" data-routine="Legs (Quads/Hamstrings)">Legs & Core</button>
           <button class="btn btn-sm btn-secondary routine-select-pill" data-routine="Upper Hypertrophy">Upper Hypertrophy</button>
+          <button class="btn btn-sm btn-outline" id="openPlanDirectBtn" style="border-color: var(--accent-cyan); color: var(--accent-cyan); white-space: nowrap;">
+            <i class="fa-solid fa-list-check"></i> Plan Details & Checklist
+          </button>
         </div>
 
         <!-- Two Column Interactive Tools Row: Rest Timer & 1RM Calculator -->
@@ -597,7 +610,7 @@
         <i class="fa-solid fa-medal"></i>
         <span>Badminton</span>
       </a>
-      <a href="login.html" class="bottom-nav-item">
+      <a href="index.html?profile=1" class="bottom-nav-item">
         <i class="fa-solid fa-user"></i>
         <span>Profile</span>
       </a>
@@ -645,10 +658,130 @@
     </div>
   </div>
 
+  <!-- Detailed Workout Plan & Checklist Modal -->
+  <div class="modal-overlay" id="workoutPlanModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div class="modal-title" style="display: flex; align-items: center; gap: 0.6rem;">
+          <i class="fa-solid fa-clipboard-list" style="color: var(--primary);"></i>
+          <span id="planModalRoutineTitle">Pull Day (Back & Biceps)</span>
+        </div>
+        <button class="modal-close-btn" data-close-modal><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Target Overview Banner -->
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem; padding: 1rem; background: var(--bg-surface-elevated); border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Target Muscle Groups</div>
+            <div style="font-size: 1.1rem; font-weight: 800; color: var(--text-main); margin-top: 0.2rem;" id="planModalMuscles">Back, Biceps & Forearms</div>
+          </div>
+          <div style="display: flex; gap: 1.25rem; align-items: center;">
+            <div>
+              <span style="font-size: 0.72rem; color: var(--text-muted); display: block; text-transform: uppercase;">Duration</span>
+              <strong style="font-size: 1.05rem; color: var(--accent-cyan);" id="planModalDuration">65 mins</strong>
+            </div>
+            <div>
+              <span style="font-size: 0.72rem; color: var(--text-muted); display: block; text-transform: uppercase;">Est. Calories</span>
+              <strong style="font-size: 1.05rem; color: var(--accent-orange);" id="planModalCalories">560 kcal</strong>
+            </div>
+            <div>
+              <span style="font-size: 0.72rem; color: var(--text-muted); display: block; text-transform: uppercase;">Intensity</span>
+              <span class="badge badge-emerald" id="planModalIntensity">High</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Completion Progress Bar -->
+        <div style="margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 0.4rem;">
+            <span style="font-weight: 700; color: var(--text-secondary);">Workout Progress</span>
+            <span style="font-weight: 800; color: var(--primary);" id="planProgressText">0 / 0 completed (0%)</span>
+          </div>
+          <div style="height: 8px; background: rgba(255,255,255,0.06); border-radius: var(--radius-full); overflow: hidden;">
+            <div id="planProgressBar" style="height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--accent-cyan)); transition: width 0.3s ease;"></div>
+          </div>
+        </div>
+
+        <!-- Exercise Checklist Grouped by Muscle -->
+        <div id="planExercisesList" style="display: flex; flex-direction: column; gap: 1rem;">
+          <!-- Exercises populated dynamically -->
+        </div>
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 0.8rem; color: var(--text-muted);">Check off exercises as you finish each movement.</span>
+        <div style="display: flex; gap: 0.75rem;">
+          <button type="button" class="btn btn-secondary" data-close-modal>Close</button>
+          <button type="button" class="btn btn-primary" id="planFinishWorkoutBtn">
+            <i class="fa-solid fa-check-double"></i> Complete & Log Workout
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Workout Completion Summary Modal -->
+  <div class="modal-overlay" id="workoutSummaryModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title" style="display: flex; align-items: center; gap: 0.6rem;">
+          <span style="font-size: 1.4rem;">🏆</span>
+          <span>Workout Completed!</span>
+        </div>
+        <button class="modal-close-btn" data-close-modal><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body" style="text-align: center; padding: 1.5rem;">
+        <div style="font-size: 3rem; margin-bottom: 0.5rem;">💪</div>
+        <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.25rem;" id="summaryRoutineTitle">Pull Day</h3>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem;">Great training session! Your progress has been saved to your profile and live calendar.</p>
+
+        <div class="grid-2" style="gap: 0.75rem; text-align: left; margin-bottom: 1.25rem;">
+          <div class="perf-metric-box">
+            <div class="perf-metric-label">Exercises Completed</div>
+            <div class="perf-metric-value" id="summaryExercises">0 / 0</div>
+          </div>
+          <div class="perf-metric-box">
+            <div class="perf-metric-label">Completion Rate</div>
+            <div class="perf-metric-value" style="color: var(--primary);" id="summaryCompletion">100%</div>
+          </div>
+          <div class="perf-metric-box">
+            <div class="perf-metric-label">Total Duration</div>
+            <div class="perf-metric-value" style="color: var(--accent-cyan);" id="summaryDuration">45m</div>
+          </div>
+          <div class="perf-metric-box">
+            <div class="perf-metric-label">Estimated Calories</div>
+            <div class="perf-metric-value" style="color: var(--accent-orange);" id="summaryCalories">520 kcal</div>
+          </div>
+        </div>
+
+        <div style="padding: 0.85rem; background: rgba(0, 245, 155, 0.08); border: 1px solid rgba(0, 245, 155, 0.25); border-radius: var(--radius-sm); text-align: left; margin-bottom: 1rem;">
+          <div style="font-size: 0.72rem; color: var(--primary); text-transform: uppercase; font-weight: 800; margin-bottom: 0.2rem;">
+            Performance Comparison
+          </div>
+          <div style="font-size: 0.85rem; color: var(--text-main); font-weight: 600;" id="summaryComparison">
+            +6.4% output volume vs previous training baseline. Progressive overload target maintained!
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="justify-content: center; gap: 0.75rem;">
+        <button type="button" class="btn btn-secondary" style="min-width: 120px;" data-close-modal>
+          Stay Here
+        </button>
+        <button type="button" class="btn btn-primary" style="min-width: 140px;" onclick="window.location.href='index.html'">
+          <i class="fa-solid fa-chart-line"></i> View Dashboard
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification Container -->
   <div class="toast-container"></div>
 
   <!-- Scripts -->
+  <script src="js/api.js"></script>
   <script src="js/app.js"></script>
   <script src="js/gym.js"></script>
 </body>

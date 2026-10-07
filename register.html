@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PulseFit - Athlete Registration | Join Sports & Fitness Hub</title>
+  <title>Fitora - Athlete Registration | Join Sports & Fitness Hub</title>
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,7 +32,7 @@
           <div class="brand-icon">
             <i class="fa-solid fa-heart-pulse"></i>
           </div>
-          <div class="brand-text">PULSE<span>FIT</span></div>
+          <div class="brand-text">FIT<span>ORA</span></div>
         </div>
 
         <h1 class="showcase-title">
@@ -72,7 +72,7 @@
           <div class="brand-icon">
             <i class="fa-solid fa-heart-pulse"></i>
           </div>
-          <div class="brand-text">PULSE<span>FIT</span></div>
+          <div class="brand-text">FIT<span>ORA</span></div>
         </div>
         <h2>Create Athlete Profile</h2>
         <p>Already an athlete? <a href="login.html">Sign in here</a></p>
@@ -102,7 +102,76 @@
           <label class="form-label" for="regEmail">Email Address</label>
           <div class="input-wrapper">
             <i class="fa-regular fa-envelope input-icon-left"></i>
-            <input type="email" id="regEmail" class="form-control has-icon-left" placeholder="alex@pulsefit.io" required>
+            <input type="email" id="regEmail" class="form-control has-icon-left" placeholder="alex@Fitora.io" required>
+          </div>
+        </div>
+
+        <!-- Body Profile Onboarding Section -->
+        <div style="background: rgba(0, 245, 155, 0.04); border: 1px solid rgba(0, 245, 155, 0.2); border-radius: var(--radius-md); padding: 1.15rem; margin-bottom: 1.25rem;">
+          <div style="font-size: 0.85rem; font-weight: 700; color: var(--primary); margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.4rem;">
+            <i class="fa-solid fa-weight-scale"></i> Athlete Body Metrics (Required for Calculations)
+          </div>
+          <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.85rem; line-height: 1.4;">
+            Your height and weight directly power your personalized BMI, basal metabolic rate (BMR), daily calorie target, and hydration calculations.
+          </p>
+
+          <div class="grid-2" style="gap: 0.85rem; margin-bottom: 0.85rem;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="regHeight">Height (cm) <span style="color: #ff4757;">*</span></label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-ruler-vertical input-icon-left"></i>
+                <input type="number" id="regHeight" class="form-control has-icon-left" placeholder="175" min="90" max="250" required>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="regWeight">Weight (kg) <span style="color: #ff4757;">*</span></label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-weight-hanging input-icon-left"></i>
+                <input type="number" id="regWeight" class="form-control has-icon-left" placeholder="72" min="30" max="250" step="0.1" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2" style="gap: 0.85rem; margin-bottom: 0.85rem;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="regAge">Age (years) <span style="color: #ff4757;">*</span></label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-calendar input-icon-left"></i>
+                <input type="number" id="regAge" class="form-control has-icon-left" placeholder="24" min="10" max="100" value="24" required>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="regGender">Biological Gender</label>
+              <select id="regGender" class="form-control">
+                <option value="Male" selected>Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid-2" style="gap: 0.85rem; margin-bottom: 0;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="regFitnessGoal">Primary Fitness Goal</label>
+              <select id="regFitnessGoal" class="form-control">
+                <option value="Sports performance" selected>Sports performance (High athletic output)</option>
+                <option value="Muscle building">Muscle building (Hypertrophy)</option>
+                <option value="Fat loss">Fat loss (Caloric deficit)</option>
+                <option value="General fitness">General fitness & stamina</option>
+                <option value="Weight maintenance">Weight maintenance</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="regDietaryPref">Dietary Preference</label>
+              <select id="regDietaryPref" class="form-control">
+                <option value="Vegetarian" selected>Pure Vegetarian</option>
+                <option value="Eggetarian">Eggetarian (+ Eggs)</option>
+                <option value="Non-Vegetarian">Non-Vegetarian (+ Chicken/Fish)</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -136,12 +205,12 @@
 
         <!-- Fitness Level -->
         <div class="form-group">
-          <label class="form-label" for="regFitnessLevel">Current Fitness Level</label>
+          <label class="form-label" for="regFitnessLevel">Current Activity / Training Frequency</label>
           <select id="regFitnessLevel" class="form-control">
-            <option value="Beginner Athlete">Beginner (Getting Started)</option>
-            <option value="Intermediate Athlete">Intermediate (Regular Training)</option>
-            <option value="Advanced Athlete" selected>Advanced (Competitive / Daily)</option>
-            <option value="Pro Athlete">Pro / High Performance</option>
+            <option value="Beginner Athlete">Beginner (1-3 days/week)</option>
+            <option value="Intermediate Athlete">Intermediate (3-5 days/week)</option>
+            <option value="Advanced Athlete" selected>Advanced (Hard training 6-7 days/week)</option>
+            <option value="Pro Athlete">Pro / High Athletic Intensity</option>
           </select>
         </div>
 
@@ -150,7 +219,7 @@
             <label class="form-label" for="regPassword">Password</label>
             <div class="input-wrapper">
               <i class="fa-solid fa-lock input-icon-left"></i>
-              <input type="password" id="regPassword" class="form-control has-icon-left" placeholder="Create password" required>
+              <input type="password" id="regPassword" class="form-control has-icon-left" placeholder="Create password" required minlength="6">
             </div>
             <div class="password-strength-meter">
               <div class="strength-step" id="str1"></div>
@@ -163,7 +232,7 @@
             <label class="form-label" for="regConfirmPassword">Confirm Password</label>
             <div class="input-wrapper">
               <i class="fa-solid fa-shield-halved input-icon-left"></i>
-              <input type="password" id="regConfirmPassword" class="form-control has-icon-left" placeholder="Re-enter password" required>
+              <input type="password" id="regConfirmPassword" class="form-control has-icon-left" placeholder="Re-enter password" required minlength="6">
             </div>
           </div>
         </div>
@@ -172,16 +241,46 @@
           <label class="form-check">
             <input type="checkbox" id="regTerms" required checked>
             <span class="form-check-label" style="font-size: 0.8rem;">
-              I agree to the PulseFit <a href="#" style="color: var(--primary);">Terms of Service</a> & <a href="#" style="color: var(--primary);">Privacy Policy</a>
+              I agree to the Fitora <a href="#" style="color: var(--primary);">Terms of Service</a> & <a href="#" style="color: var(--primary);">Privacy Policy</a>
             </span>
           </label>
         </div>
 
         <button type="submit" class="btn btn-primary btn-lg btn-full" id="regSubmitBtn">
-          <span>Complete Registration</span>
-          <i class="fa-solid fa-user-plus"></i>
+          <span>Complete Registration & Launch Fitora</span>
+          <i class="fa-solid fa-arrow-right"></i>
         </button>
       </form>
+    </div>
+  </div>
+
+  <!-- OAuth Setup Guidance Modal -->
+  <div class="modal-overlay" id="oauthModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title" id="oauthModalTitle">
+          <i class="fa-brands fa-google" style="color: #ea4335;"></i> OAuth Configuration Notice
+        </div>
+        <button class="modal-close-btn" data-close-modal>
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="oauthModalMsg" style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5; margin-bottom: 1rem;">
+          To activate direct social login in your environment, configure the OAuth credentials in your backend configuration file.
+        </p>
+        <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0.85rem; font-family: monospace; font-size: 0.82rem; margin-bottom: 1rem; color: var(--accent-cyan);" id="oauthModalCode">
+          GOOGLE_CLIENT_ID=your_client_id_here<br>
+          GOOGLE_CLIENT_SECRET=your_client_secret_here<br>
+          GOOGLE_CALLBACK_URL=http://localhost:5000/api/auth/google/callback
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+          <i class="fa-solid fa-shield-halved" style="color: var(--primary);"></i> In accordance with security standards, credentials are stored securely via environment variables and never exposed in client source code.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-close-modal>Understood</button>
+      </div>
     </div>
   </div>
 
@@ -189,6 +288,7 @@
   <div class="toast-container"></div>
 
   <!-- Scripts -->
+  <script src="js/api.js"></script>
   <script src="js/app.js"></script>
   <script>
     if (window.innerWidth <= 900) {
@@ -208,57 +308,78 @@
       s2.className = "strength-step";
       s3.className = "strength-step";
 
-      if (val.length >= 4) {
-        s1.classList.add("active-weak");
-      }
-      if (val.length >= 7 && /[A-Z0-9]/.test(val)) {
-        s2.classList.add("active-medium");
-      }
-      if (val.length >= 9 && /[^A-Za-z0-9]/.test(val)) {
-        s3.classList.add("active-strong");
-      }
+      if (val.length >= 4) s1.classList.add("active-weak");
+      if (val.length >= 7 && /[A-Z0-9]/.test(val)) s2.classList.add("active-medium");
+      if (val.length >= 9 && /[^A-Za-z0-9]/.test(val)) s3.classList.add("active-strong");
     });
 
-    // Handle Form Submit
-    document.getElementById("registerForm").addEventListener("submit", (e) => {
+    // Handle Form Submit – real backend registration
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const p1 = document.getElementById("regPassword").value;
       const p2 = document.getElementById("regConfirmPassword").value;
 
       if (p1 !== p2) {
-        showToast("Passwords do not match. Please verify.", "error");
+        Fitora.showToast("Passwords do not match. Please verify.", "error");
         return;
       }
 
-      const fullName = document.getElementById("regFullName").value;
-      const username = document.getElementById("regUsername").value;
-      const email = document.getElementById("regEmail").value;
-      const fitnessLevel = document.getElementById("regFitnessLevel").value;
+      const heightVal = parseFloat(document.getElementById("regHeight").value);
+      const weightVal = parseFloat(document.getElementById("regWeight").value);
+      const ageVal    = parseInt(document.getElementById("regAge").value) || 24;
+      const genderVal = document.getElementById("regGender").value || 'Male';
+      const goalVal   = document.getElementById("regFitnessGoal").value || 'Sports performance';
+      const dietVal   = document.getElementById("regDietaryPref").value || 'Vegetarian';
+
+      if (!heightVal || heightVal < 90 || heightVal > 250) {
+        Fitora.showToast("Please enter a valid height between 90 and 250 cm.", "error");
+        return;
+      }
+      if (!weightVal || weightVal < 30 || weightVal > 250) {
+        Fitora.showToast("Please enter a valid weight between 30 and 250 kg.", "error");
+        return;
+      }
 
       const checkedSports = Array.from(document.querySelectorAll('input[name="sports"]:checked')).map(cb => cb.value);
+      const primarySport  = checkedSports[0] || 'Gym';
 
-      const newUser = {
-        name: fullName,
-        username: username,
-        email: email,
-        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
-        fitnessLevel: fitnessLevel,
-        streakDays: 1,
-        primarySports: checkedSports
+      const fitnessLevelVal = document.getElementById("regFitnessLevel")?.value || 'Advanced Athlete';
+      const levelMap = {
+        'Beginner Athlete': 'Lightly Active',
+        'Intermediate Athlete': 'Moderately Active',
+        'Advanced Athlete': 'Very Active',
+        'Pro Athlete': 'Extremely Active'
       };
 
-      localStorage.setItem("pulsefit_user", JSON.stringify(newUser));
+      const userData = {
+        name:              document.getElementById("regFullName").value.trim(),
+        username:          document.getElementById("regUsername").value.trim(),
+        email:             document.getElementById("regEmail").value.trim(),
+        password:          p1,
+        height:            heightVal,
+        weight:            weightVal,
+        age:               ageVal,
+        gender:            genderVal,
+        fitnessGoal:       goalVal,
+        dietaryPreference: dietVal,
+        activityLevel:     levelMap[fitnessLevelVal] || 'Moderately Active',
+        selectedSport:     primarySport,
+        primarySports:     checkedSports
+      };
 
       const btn = document.getElementById("regSubmitBtn");
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Setting Up Account...';
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Setting Up Athlete Account...';
       btn.disabled = true;
 
-      setTimeout(() => {
-        showToast(`Welcome aboard, ${fullName}! Your athlete hub is ready.`, "success");
-        setTimeout(() => {
-          window.location.href = "index.html";
-        }, 800);
-      }, 700);
+      try {
+        const data = await Fitora.Auth.register(userData);
+        Fitora.showToast(data.message || `Welcome to Fitora, ${userData.name}!`, 'success');
+        setTimeout(() => { window.location.href = 'index.html'; }, 800);
+      } catch (err) {
+        Fitora.showToast(err.message, 'error');
+        btn.innerHTML = '<span>Complete Registration & Launch Fitora</span><i class="fa-solid fa-arrow-right"></i>';
+        btn.disabled = false;
+      }
     });
   </script>
 </body>

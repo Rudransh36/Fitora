@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitora - Indian Diet & Sports Nutrition | Meal Planner</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/sports.css">
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* ── Diet page topbar fix: prevent profile section from collapsing with sidebar ── */
+    .topbar {
+      overflow: visible;
+    }
+    .topbar-left {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+    .topbar-left .search-box {
+      width: 100%;
+      max-width: 260px;
+      min-width: 0;
+    }
+    .topbar-right {
+      flex: 0 0 auto;
+      flex-wrap: nowrap;
+      gap: 0.75rem;
+    }
+    .topbar-right .user-profile-menu {
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .topbar-right .quick-action-btn span,
+    .topbar-right .btn span {
+      display: inline; /* keep labels visible */
+    }
+
+    .diet-hero {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(0, 210, 255, 0.05) 100%);
+      border: 1px solid rgba(34, 197, 94, 0.25);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem 2rem;
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .diet-hero-title {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .diet-hero-title i {
+      color: #22c55e;
+    }
+    .diet-hero-desc {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      max-width: 650px;
+      line-height: 1.5;
+    }
+    .diet-tags {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .diet-pill {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-full);
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .meal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+      transition: transform var(--transition-base), border-color var(--transition-base);
+    }
+    .meal-card:hover {
+      border-color: rgba(34, 197, 94, 0.4);
+      transform: translateY(-2px);
+    }
+    .meal-card-header {
+      padding: 1.25rem 1.5rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .meal-title-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .meal-icon-box {
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+    .meal-name {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .meal-timing {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .meal-items-list {
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .food-item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
+    }
+    .food-item-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .food-details {
+      flex: 1;
+    }
+    .food-name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #f1f5f9;
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .food-portion {
+      font-size: 0.85rem;
+      color: var(--accent-cyan);
+      margin-bottom: 0.35rem;
+    }
+    .food-note {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+    .food-macros {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+      text-align: right;
+    }
+    .macro-pill {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.55rem;
+      border-radius: 6px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .macro-cal { background: rgba(255, 159, 26, 0.15); color: #ff9f1a; border: 1px solid rgba(255, 159, 26, 0.3); }
+    .macro-pro { background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); }
+    .macro-carb { background: rgba(0, 210, 255, 0.15); color: #00d2ff; border: 1px solid rgba(0, 210, 255, 0.3); }
+    .macro-fat { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .region-tag {
+      background: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
+      font-size: 0.7rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      font-weight: 700;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .superfood-item {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .superfood-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    .superfood-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(34, 197, 94, 0.15);
+      color: #22c55e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .superfood-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.2rem;
+    }
+    .superfood-desc {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-shell">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="brand-logo">
+          <div class="brand-icon">
+            <i class="fa-solid fa-heart-pulse"></i>
+          </div>
+          <div class="brand-text">FIT<span>ORA</span></div>
+        </a>
+        <button class="sidebar-close-btn" aria-label="Close Sidebar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="sidebar-content">
+        <div>
+          <div class="nav-section-title">Main Menu</div>
+          <ul class="nav-list">
+            <li class="nav-item">
+              <a href="index.html">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="gym.html">
+                <i class="fa-solid fa-dumbbell"></i>
+                <span>Gym & Lift</span>
+                <span class="nav-badge">4 PRs</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="cricket.html">
+                <i class="fa-solid fa-baseball-bat-ball"></i>
+                <span>Cricket Hub</span>
+                <span class="nav-badge" style="color: var(--accent-cyan);">SR 138</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="badminton.html">
+                <i class="fa-solid fa-medal"></i>
+                <span>Badminton</span>
+                <span class="nav-badge" style="color: var(--primary);">Live</span>
+              </a>
+            </li>
+            <li class="nav-item active">
+              <a href="diet.html">
+                <i class="fa-solid fa-bowl-food"></i>
+                <span>Diet & Nutrition</span>
+                <span class="nav-badge" style="background: rgba(34, 197, 94, 0.15); color: #22c55e;">Indian</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="nav-section-title">Athlete Insights</div>
+          <ul class="nav-list">
+            <li class="nav-item">
+              <a href="javascript:void(0)" onclick="event.stopPropagation(); openHydrationModal()">
+                <i class="fa-solid fa-bottle-water"></i>
+                <span>Hydration Tracker</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="javascript:void(0)" onclick="event.stopPropagation(); openAyurvedaModal()">
+                <i class="fa-solid fa-leaf"></i>
+                <span>Ayurvedic Balance</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="javascript:void(0)" onclick="event.stopPropagation(); openModal('dietPrefsModal')">
+                <i class="fa-solid fa-sliders"></i>
+                <span>Customize Nutrition</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Sidebar User Footer Card -->
+        <div class="sidebar-user-card">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="Athlete Avatar" class="sidebar-user-avatar" data-user-avatar>
+          <div class="sidebar-user-info">
+            <div class="sidebar-user-name" data-user-name>Alex Rivera</div>
+            <div class="sidebar-user-role" data-user-role>Advanced Athlete</div>
+          </div>
+          <button class="sidebar-logout-btn" title="Sign Out">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+      
+      <!-- Top Navigation Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu-toggle" aria-label="Open Navigation">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" class="search-input" placeholder="Search foods, ingredients, macros...">
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <button class="quick-action-btn" id="openPrefsBtn" style="background: rgba(34, 197, 94, 0.15); color: #22c55e; border-color: rgba(34, 197, 94, 0.3);">
+            <i class="fa-solid fa-sliders"></i>
+            <span>Preferences</span>
+          </button>
+
+          <button class="btn btn-primary" id="regeneratePlanBtn" style="padding: 0.6rem 1.1rem; font-size: 0.85rem;">
+            <i class="fa-solid fa-arrows-rotate"></i>
+            <span>Regenerate Plan</span>
+          </button>
+
+          <div class="user-profile-menu" title="Athlete Profile" id="topbarProfileMenu">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="User Profile" class="user-profile-avatar" data-user-avatar id="topbarUserAvatar">
+            <span class="user-profile-label topbar-user-name" data-user-name id="topbarUserName">Alex Rivera</span>
+            <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--text-muted); margin-left: 0.25rem;"></i>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Page Container -->
+      <main class="page-container">
+        
+        <!-- Hero Section -->
+        <div class="diet-hero">
+          <div>
+            <div class="diet-hero-title">
+              <i class="fa-solid fa-bowl-food"></i>
+              <span>Personalized Indian Sports Nutrition</span>
+            </div>
+            <div class="diet-hero-desc">
+              Precision calorie and macro distribution formulated with authentic Indian whole grains, Maharashtrian stamina staples (Bhakri, Pithla, Matki Usal, Taak), and natural high-protein sources.
+            </div>
+            <div class="diet-tags">
+              <div class="diet-pill"><i class="fa-solid fa-bullseye" style="color: var(--primary);"></i> Goal: <strong id="dietGoalLabel">Muscle building</strong></div>
+              <div class="diet-pill"><i class="fa-solid fa-person-running" style="color: var(--accent-cyan);"></i> Sport: <strong id="dietSportLabel">Gym</strong></div>
+              <div class="diet-pill" id="dietPrefPill" style="cursor: pointer;" title="Click to customize dietary preferences"><i class="fa-solid fa-seedling" id="dietPrefIcon" style="color: #22c55e;"></i> Preference: <strong id="dietPrefLabel">Vegetarian</strong> <i class="fa-solid fa-pen-to-square" style="font-size: 0.7rem; margin-left: 4px; opacity: 0.7;"></i></div>
+              <div class="diet-pill"><i class="fa-solid fa-location-dot" style="color: #f59e0b;"></i> Regional: <strong>Maharashtra Specialties Included</strong></div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+            <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 0.35rem 0.75rem;">
+              <label for="quickDietSelect" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; margin: 0; white-space: nowrap;">
+                <i class="fa-solid fa-utensils" style="color: #22c55e;"></i> Diet:
+              </label>
+              <select id="quickDietSelect" class="form-control" style="background: transparent; border: none; color: #fff; font-size: 0.85rem; font-weight: 700; padding: 0.2rem 0.4rem; cursor: pointer; outline: none; width: auto;">
+                <option value="Vegetarian" style="background: #0f172a; color: #fff;">🥗 Vegetarian</option>
+                <option value="Eggetarian" style="background: #0f172a; color: #fff;">🥚 Eggetarian</option>
+                <option value="Non-Vegetarian" style="background: #0f172a; color: #fff;">🍗 Non-Vegetarian</option>
+              </select>
+            </div>
+            <button class="btn btn-secondary" id="heroRegenBtn">
+              <i class="fa-solid fa-rotate"></i> Recalculate TDEE
+            </button>
+          </div>
+        </div>
+
+        <!-- KPI Metrics Row -->
+        <div class="dashboard-grid-4" style="margin-bottom: 2rem;">
+          
+          <div class="card stat-card" style="--stat-glow: rgba(255, 159, 26, 0.2);">
+            <div class="stat-card-header">
+              <div class="stat-card-label">Daily Target Calories</div>
+              <div class="stat-card-icon" style="background: rgba(255, 159, 26, 0.15); color: #ff9f1a;">
+                <i class="fa-solid fa-fire-flame-curved"></i>
+              </div>
+            </div>
+            <div class="stat-card-value" id="kpiTargetCalories">3,348 <span style="font-size: 1rem; color: var(--text-muted);">kcal</span></div>
+            <div class="stat-card-footer">
+              <span class="badge" style="background: rgba(255, 159, 26, 0.15); color: #ff9f1a;">TDEE Aligned</span>
+              <span style="font-size: 0.8rem; color: var(--text-muted);" id="kpiBmrLabel">BMR: ~1,738 kcal</span>
+            </div>
+          </div>
+
+          <div class="card stat-card" style="--stat-glow: rgba(34, 197, 94, 0.2);">
+            <div class="stat-card-header">
+              <div class="stat-card-label">Daily Protein Target</div>
+              <div class="stat-card-icon" style="background: rgba(34, 197, 94, 0.15); color: #22c55e;">
+                <i class="fa-solid fa-dna"></i>
+              </div>
+            </div>
+            <div class="stat-card-value" id="kpiProtein">133 <span style="font-size: 1rem; color: var(--text-muted);">g</span></div>
+            <div class="stat-card-footer">
+              <span class="badge badge-emerald" id="kpiProteinPct">~16% of total</span>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">~1.8g / kg</span>
+            </div>
+          </div>
+
+          <div class="card stat-card" style="--stat-glow: rgba(0, 210, 255, 0.2);">
+            <div class="stat-card-header">
+              <div class="stat-card-label">Complex Carbohydrates</div>
+              <div class="stat-card-icon" style="background: rgba(0, 210, 255, 0.15); color: #00d2ff;">
+                <i class="fa-solid fa-wheat-awn"></i>
+              </div>
+            </div>
+            <div class="stat-card-value" id="kpiCarbs">488 <span style="font-size: 1rem; color: var(--text-muted);">g</span></div>
+            <div class="stat-card-footer">
+              <span class="badge badge-cyan" id="kpiCarbsPct">~58% of total</span>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Sustained Glycogen</span>
+            </div>
+          </div>
+
+          <div class="card stat-card" style="--stat-glow: rgba(239, 68, 68, 0.2);">
+            <div class="stat-card-header">
+              <div class="stat-card-label">Healthy Fats</div>
+              <div class="stat-card-icon" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;">
+                <i class="fa-solid fa-droplet"></i>
+              </div>
+            </div>
+            <div class="stat-card-value" id="kpiFats">96 <span style="font-size: 1rem; color: var(--text-muted);">g</span></div>
+            <div class="stat-card-footer">
+              <span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;" id="kpiFatsPct">~26% of total</span>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Hormone Support</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Main Content 2-Column Grid -->
+        <div class="dashboard-main-grid">
+          
+          <!-- Left Column: Daily Meal Plans -->
+          <div class="dashboard-left-col">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+              <h3 style="font-size: 1.25rem; font-weight: 700; color: #fff;">
+                <i class="fa-solid fa-utensils" style="color: #22c55e; margin-right: 0.5rem;"></i> Daily Meal Schedule
+              </h3>
+              <span style="font-size: 0.85rem; color: var(--text-muted);">5 Nutritional Windows</span>
+            </div>
+
+            <!-- Breakfast Card -->
+            <div class="meal-card" id="mealCardBreakfast">
+              <div class="meal-card-header">
+                <div class="meal-title-group">
+                  <div class="meal-icon-box" style="background: rgba(255, 159, 26, 0.15); color: #ff9f1a;">
+                    <i class="fa-solid fa-sun"></i>
+                  </div>
+                  <div>
+                    <div class="meal-name">Breakfast (सकाळचा नाश्ता)</div>
+                    <div class="meal-timing">07:30 AM – 08:30 AM • High complex carbs & quick clean protein</div>
+                  </div>
+                </div>
+                <div class="badge" style="background: rgba(255, 159, 26, 0.15); color: #ff9f1a;">Morning Ignition</div>
+              </div>
+              <div class="meal-items-list" id="breakfastItems">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- Lunch Card -->
+            <div class="meal-card" id="mealCardLunch">
+              <div class="meal-card-header">
+                <div class="meal-title-group">
+                  <div class="meal-icon-box" style="background: rgba(34, 197, 94, 0.15); color: #22c55e;">
+                    <i class="fa-solid fa-plate-wheat"></i>
+                  </div>
+                  <div>
+                    <div class="meal-name" id="lunchTitleLabel">Lunch (दुपारचे जेवण)</div>
+                    <div class="meal-timing" id="lunchTimingLabel">01:00 PM – 02:00 PM • Nutrient-dense main fuel window</div>
+                  </div>
+                </div>
+                <div class="badge badge-emerald">Main Fuel Window</div>
+              </div>
+              <div class="meal-items-list" id="lunchItems">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- Evening Snack Card -->
+            <div class="meal-card" id="mealCardEvening">
+              <div class="meal-card-header">
+                <div class="meal-title-group">
+                  <div class="meal-icon-box" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+                    <i class="fa-solid fa-mug-hot"></i>
+                  </div>
+                  <div>
+                    <div class="meal-name" id="eveningTitleLabel">Evening Snack (संध्याकाळचा खाऊ)</div>
+                    <div class="meal-timing" id="eveningTimingLabel">05:00 PM – 05:45 PM • Natural iron, probiotics & mineral boost</div>
+                  </div>
+                </div>
+                <div class="badge" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">Stamina Restoration</div>
+              </div>
+              <div class="meal-items-list" id="eveningItems">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- Dinner Card -->
+            <div class="meal-card" id="mealCardDinner">
+              <div class="meal-card-header">
+                <div class="meal-title-group">
+                  <div class="meal-icon-box" style="background: rgba(0, 210, 255, 0.15); color: #00d2ff;">
+                    <i class="fa-solid fa-moon"></i>
+                  </div>
+                  <div>
+                    <div class="meal-name">Dinner (रात्रीचे जेवण)</div>
+                    <div class="meal-timing">08:00 PM – 09:00 PM • Easily digestible restorative meal for recovery</div>
+                  </div>
+                </div>
+                <div class="badge badge-cyan">Night Repair</div>
+              </div>
+              <div class="meal-items-list" id="dinnerItems">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- Post Workout Card -->
+            <div class="meal-card" id="mealCardPostWorkout">
+              <div class="meal-card-header">
+                <div class="meal-title-group">
+                  <div class="meal-icon-box" style="background: rgba(168, 85, 247, 0.15); color: #a855f7;">
+                    <i class="fa-solid fa-bolt"></i>
+                  </div>
+                  <div>
+                    <div class="meal-name">Post-Workout Recovery (व्यायामानंतर)</div>
+                    <div class="meal-timing">Within 45 mins of training • Immediate glycogen refill & muscle protein synthesis</div>
+                  </div>
+                </div>
+                <div class="badge" style="background: rgba(168, 85, 247, 0.15); color: #a855f7;">Anabolic Window</div>
+              </div>
+              <div class="meal-items-list" id="postWorkoutItems">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Right Column: Sidebar Analytics & Sport Nutrition -->
+          <div class="dashboard-right-col">
+            
+            <!-- Macronutrient Distribution Chart -->
+            <div class="card" style="margin-bottom: 1.5rem;">
+              <div class="card-header">
+                <div class="card-title">
+                  <i class="fa-solid fa-chart-pie" style="color: #22c55e;"></i>
+                  <span>Macro Distribution</span>
+                </div>
+              </div>
+              <div style="position: relative; height: 230px; margin: 0 auto;">
+                <canvas id="dietMacroChart"></canvas>
+              </div>
+              <div style="display: flex; justify-content: space-around; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-subtle); text-align: center;">
+                <div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Protein</div>
+                  <div style="font-weight: 700; color: #22c55e;" id="macroPctP">16%</div>
+                </div>
+                <div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Carbs</div>
+                  <div style="font-weight: 700; color: #00d2ff;" id="macroPctC">58%</div>
+                </div>
+                <div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Fats</div>
+                  <div style="font-weight: 700; color: #ef4444;" id="macroPctF">26%</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hydration Protocol -->
+            <div class="card" style="margin-bottom: 1.5rem;">
+              <div class="card-header">
+                <div class="card-title">
+                  <i class="fa-solid fa-bottle-water" style="color: var(--accent-cyan);"></i>
+                  <span>Hydration & Electrolytes</span>
+                </div>
+                <span class="badge badge-cyan" id="dailyWaterTargetBadge">3.4 L / Day</span>
+              </div>
+              <div style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;" id="hydrationGuidelineText">
+                Drink 3.2 to 3.8 Litres of water daily. Include 1 glass of Taak (buttermilk) after training for potassium and sodium replenishment.
+              </div>
+              <div style="background: rgba(0, 210, 255, 0.06); border: 1px solid rgba(0, 210, 255, 0.2); border-radius: var(--radius-md); padding: 0.85rem; font-size: 0.82rem; color: #e2e8f0;">
+                <strong style="color: var(--accent-cyan);"><i class="fa-solid fa-lightbulb"></i> Desi Electrolyte Tip:</strong> Fresh Nimbu Pani with rock salt (saindhav meeth) and a pinch of roasted jeera provides bioavailable sodium, potassium, and magnesium without industrial synthetic sugars.
+              </div>
+            </div>
+
+            <!-- Sport-Specific Nutrition Focus -->
+            <div class="card" style="margin-bottom: 1.5rem;">
+              <div class="card-header">
+                <div class="card-title">
+                  <i class="fa-solid fa-medal" style="color: #ff9f1a;"></i>
+                  <span>Sport Nutrition Focus</span>
+                </div>
+              </div>
+              <p style="font-size: 0.9rem; color: #e2e8f0; line-height: 1.5; margin-bottom: 1rem;" id="sportFocusText">
+                High-protein hypertrophy plan targeting ~133g protein with nutrient-dense Indian legumes, dairy, and whole grains.
+              </p>
+              <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.82rem; color: var(--text-secondary);">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <i class="fa-solid fa-check" style="color: #22c55e;"></i> Pre-workout: Complex carbohydrates 90 mins prior
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <i class="fa-solid fa-check" style="color: #22c55e;"></i> Post-workout: High amino-acid sattu/curd within 45 mins
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <i class="fa-solid fa-check" style="color: #22c55e;"></i> Overnight: Casein-rich warm milk with pinch of haldi
+                </div>
+              </div>
+            </div>
+
+            <!-- Maharashtrian Superfoods Spotlight -->
+            <div class="card" style="margin-bottom: 1.5rem;">
+              <div class="card-header">
+                <div class="card-title">
+                  <i class="fa-solid fa-seedling" style="color: #22c55e;"></i>
+                  <span>Maharashtrian Superfoods</span>
+                </div>
+              </div>
+
+              <div class="superfood-item">
+                <div class="superfood-icon"><i class="fa-solid fa-wheat-awn"></i></div>
+                <div>
+                  <div class="superfood-title">Jowar & Bajra Bhakri</div>
+                  <div class="superfood-desc">Gluten-free millets packed with magnesium, potassium, and resistant fiber for sustained endurance without insulin spikes.</div>
+                </div>
+              </div>
+
+              <div class="superfood-item">
+                <div class="superfood-icon"><i class="fa-solid fa-glass-water"></i></div>
+                <div>
+                  <div class="superfood-title">Masala Taak (Fresh Buttermilk)</div>
+                  <div class="superfood-desc">Natural probiotic coolant with bioavailable electrolytes that lowers core body temperature after intense sessions.</div>
+                </div>
+              </div>
+
+              <div class="superfood-item">
+                <div class="superfood-icon"><i class="fa-solid fa-seedling"></i></div>
+                <div>
+                  <div class="superfood-title">Matki Usal (Sprouted Moth Beans)</div>
+                  <div class="superfood-desc">Super legume containing 23% protein, bioactive B-vitamins, and plant enzymes that aid rapid muscular tissue repair.</div>
+                </div>
+              </div>
+
+              <div class="superfood-item">
+                <div class="superfood-icon"><i class="fa-solid fa-bowl-rice"></i></div>
+                <div>
+                  <div class="superfood-title">Phutana (Roasted Chana) & Gul</div>
+                  <div class="superfood-desc">The legendary wrestling akhada snack — slow-release amino acids coupled with natural iron for high-altitude stamina.</div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Disclaimer Card -->
+            <div class="card" style="background: rgba(255, 255, 255, 0.02); border-color: rgba(255, 255, 255, 0.06);">
+              <div style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.5;" id="disclaimerText">
+                <strong style="color: var(--text-secondary);"><i class="fa-solid fa-circle-info"></i> Academic Disclaimer:</strong> Calorie estimates and nutritional values are calculated scientifically using Mifflin-St Jeor BMR and ICMR dietary guidelines for educational and athletic monitoring purposes.
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- Modal: Customize Preferences -->
+  <div class="modal-overlay" id="dietPrefsModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i class="fa-solid fa-sliders" style="color: #22c55e; margin-right: 0.5rem;"></i> Customize Nutrition Profile
+        </h3>
+        <button type="button" class="modal-close-btn" data-close-modal>
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="dietPrefsForm">
+        <div class="modal-body" style="overflow-y: auto; max-height: calc(85vh - 130px);">
+          
+          <div class="form-group">
+            <label class="form-label" for="prefSport">Primary Sport Focus</label>
+            <select id="prefSport" class="form-control">
+              <option value="Gym">Gym & Resistance Training</option>
+              <option value="Cricket">Cricket (Batting, Fast Bowling, Fielding)</option>
+              <option value="Badminton">Badminton (High Agility & Speed)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="prefGoal">Fitness / Training Goal</label>
+            <select id="prefGoal" class="form-control">
+              <option value="Muscle building">Muscle Building (Hypertrophy + Calorie Surplus)</option>
+              <option value="Fat loss">Fat Loss / Cutting (Moderate Calorie Deficit)</option>
+              <option value="Sports performance">Sports Performance & Stamina (High Glycogen)</option>
+              <option value="General fitness">General Fitness & Maintenance</option>
+              <option value="Weight maintenance">Weight Maintenance</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="prefDiet">Dietary Preference</label>
+            <select id="prefDiet" class="form-control">
+              <option value="Vegetarian">Pure Vegetarian</option>
+              <option value="Eggetarian">Eggetarian (Vegetarian + Eggs)</option>
+              <option value="Non-Vegetarian">Non-Vegetarian (Eggs, Chicken, Fish, Millets)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="prefWeight">Current Body Weight (kg)</label>
+            <input type="number" id="prefWeight" class="form-control" placeholder="e.g. 72" value="72" step="0.5" min="30" max="250" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="prefFoodsToAvoid">Foods to Avoid / Dislikes</label>
+            <input type="text" id="prefFoodsToAvoid" class="form-control" placeholder="e.g. Peanuts, Dairy, Gluten, Mushrooms">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" for="prefAllergies">Allergies / Intolerances</label>
+            <input type="text" id="prefAllergies" class="form-control" placeholder="e.g. Lactose intolerant, Nut allergy">
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal>Cancel</button>
+          <button type="submit" class="btn btn-primary" style="background: #22c55e; border-color: #22c55e;">
+            <i class="fa-solid fa-check"></i> Save & Recalculate Plan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Hydration Tracker -->
+  <div class="modal-overlay" id="hydrationModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-bottle-water" style="color: #00d2ff;"></i>
+          <span>Daily Hydration Tracker</span>
+        </div>
+        <button class="modal-close-btn" data-close-modal>
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Hydration Progress Card -->
+        <div style="background: linear-gradient(135deg, rgba(0, 210, 255, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%); border: 1px solid rgba(0, 210, 255, 0.25); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center; margin-bottom: 1.5rem;">
+          <div style="display: flex; justify-content: space-around; align-items: center; margin-bottom: 1rem;">
+            <div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">CONSUMED</div>
+              <div id="hydroConsumed" style="font-size: 1.8rem; font-weight: 800; color: #00d2ff;">0 <span style="font-size: 0.9rem; font-weight: 500;">ml</span></div>
+            </div>
+            <div style="font-size: 1.5rem; color: var(--border-subtle);">/</div>
+            <div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">DAILY GOAL</div>
+              <div id="hydroTarget" style="font-size: 1.8rem; font-weight: 800; color: #fff;">2,800 <span style="font-size: 0.9rem; font-weight: 500;">ml</span></div>
+            </div>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="progress-track" style="height: 10px; background: rgba(255, 255, 255, 0.08); border-radius: 999px; overflow: hidden; margin-bottom: 0.5rem;">
+            <div id="hydroProgressBar" class="progress-fill" style="width: 0%; background: linear-gradient(90deg, #00d2ff, #22c55e); height: 100%; transition: width 0.4s ease;"></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-secondary);">
+            <span id="hydroPercent">0% of daily target</span>
+            <span id="hydroRemaining">2,800 ml remaining</span>
+          </div>
+        </div>
+
+        <!-- Quick Log Buttons -->
+        <h4 style="font-size: 0.9rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-primary);">
+          <i class="fa-solid fa-plus" style="color: #00d2ff; margin-right: 0.35rem;"></i> Quick Log Water
+        </h4>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.65rem; margin-bottom: 1.25rem;">
+          <button type="button" class="btn btn-secondary hydro-quick-add" data-amount="250" style="padding: 0.65rem 0.25rem; font-size: 0.85rem; text-align: center; flex-direction: column; gap: 0.25rem;">
+            <i class="fa-solid fa-glass-water" style="color: #00d2ff; font-size: 1.1rem;"></i>
+            <span>+250 ml</span>
+          </button>
+          <button type="button" class="btn btn-secondary hydro-quick-add" data-amount="500" style="padding: 0.65rem 0.25rem; font-size: 0.85rem; text-align: center; flex-direction: column; gap: 0.25rem;">
+            <i class="fa-solid fa-bottle-water" style="color: #00d2ff; font-size: 1.1rem;"></i>
+            <span>+500 ml</span>
+          </button>
+          <button type="button" class="btn btn-secondary hydro-quick-add" data-amount="750" style="padding: 0.65rem 0.25rem; font-size: 0.85rem; text-align: center; flex-direction: column; gap: 0.25rem;">
+            <i class="fa-solid fa-flask" style="color: #00d2ff; font-size: 1.1rem;"></i>
+            <span>+750 ml</span>
+          </button>
+          <button type="button" class="btn btn-secondary hydro-quick-add" data-amount="1000" style="padding: 0.65rem 0.25rem; font-size: 0.85rem; text-align: center; flex-direction: column; gap: 0.25rem;">
+            <i class="fa-solid fa-jug-detergent" style="color: #00d2ff; font-size: 1.1rem;"></i>
+            <span>+1000 ml</span>
+          </button>
+        </div>
+
+        <!-- Custom Add Form -->
+        <form id="hydroCustomForm" style="display: flex; gap: 0.75rem; margin-bottom: 1.25rem;">
+          <input type="number" id="hydroCustomInput" class="form-control" placeholder="Custom amount (ml)" min="50" max="3000" step="50" required>
+          <button type="submit" class="btn btn-primary" style="background: #00d2ff; border-color: #00d2ff; color: #080c14; font-weight: 700; white-space: nowrap;">
+            <i class="fa-solid fa-plus"></i> Add
+          </button>
+        </form>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.75rem; border-top: 1px solid var(--border-subtle);">
+          <span style="font-size: 0.78rem; color: var(--text-muted);">Calculated from body weight & activity</span>
+          <button type="button" id="hydroResetBtn" class="btn btn-sm btn-ghost" style="color: #ef4444;">
+            <i class="fa-solid fa-rotate-left"></i> Reset Today
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-close-modal>Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Ayurvedic Balance -->
+  <div class="modal-overlay" id="ayurvedaModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-leaf" style="color: #22c55e;"></i>
+          <span>Ayurvedic Sports Nutrition & Digestive Balance</span>
+        </div>
+        <button class="modal-close-btn" data-close-modal>
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body" style="overflow-y: auto; max-height: calc(85vh - 130px);">
+        <!-- Intro Hero -->
+        <div style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, rgba(245, 158, 11, 0.08) 100%); border: 1px solid rgba(34, 197, 94, 0.25); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 1.25rem;">
+          <h4 style="font-size: 1.1rem; font-weight: 800; color: #fff; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span>🌿 Ahara & Agni: The Vedic Science of Athletic Vitality</span>
+          </h4>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">
+            Ayurveda views nutrition through <strong>Agni</strong> (digestive fire) and <strong>Ojas</strong> (vital energy and immunity). For competitive athletes, balancing macronutrients with digestive stamina ensures complete nutrient assimilation, reduced inflammation, and faster recovery without metabolic sluggishness.
+          </p>
+        </div>
+
+        <!-- 3 Doshas for Athletic Disciplines -->
+        <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-primary);">
+          <i class="fa-solid fa-fire-flame-simple" style="color: #ff9f1a; margin-right: 0.35rem;"></i> Tridosha Optimization for Multi-Sport Athletes
+        </h4>
+        <div class="grid-3" style="gap: 0.85rem; margin-bottom: 1.5rem;">
+          <!-- Vata -->
+          <div class="card" style="padding: 1rem; border-color: rgba(0, 210, 255, 0.25); background: rgba(0, 210, 255, 0.03);">
+            <div style="font-weight: 800; font-size: 0.95rem; color: #00d2ff; margin-bottom: 0.25rem;">
+              💨 Vata (Movement & Speed)
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem;">Badminton & Quick Reflexes</div>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; margin-bottom: 0.5rem;">
+              High movement depletes lubrication and causes joint stiffness.
+            </p>
+            <div style="font-size: 0.78rem; color: #fff; background: rgba(255,255,255,0.04); padding: 0.4rem 0.6rem; border-radius: var(--radius-sm);">
+              <strong>Key Foods:</strong> Ghee, warm spiced milk, soaked almonds, dates, sesame seeds.
+            </div>
+          </div>
+
+          <!-- Pitta -->
+          <div class="card" style="padding: 1rem; border-color: rgba(239, 68, 68, 0.25); background: rgba(239, 68, 68, 0.03);">
+            <div style="font-weight: 800; font-size: 0.95rem; color: #ef4444; margin-bottom: 0.25rem;">
+              🔥 Pitta (Metabolism & Fire)
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem;">Cricket Under Sun & High Power</div>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; margin-bottom: 0.5rem;">
+              Excessive heat causes acidity, muscle cramping, and inflammation.
+            </p>
+            <div style="font-size: 0.78rem; color: #fff; background: rgba(255,255,255,0.04); padding: 0.4rem 0.6rem; border-radius: var(--radius-sm);">
+              <strong>Key Foods:</strong> Fresh Masala Taak (buttermilk), coconut water, mint, soaked chia seeds.
+            </div>
+          </div>
+
+          <!-- Kapha -->
+          <div class="card" style="padding: 1rem; border-color: rgba(34, 197, 94, 0.25); background: rgba(34, 197, 94, 0.03);">
+            <div style="font-weight: 800; font-size: 0.95rem; color: #22c55e; margin-bottom: 0.25rem;">
+              ⛰️ Kapha (Structure & Strength)
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem;">Gym Hypertrophy & Heavy Lifts</div>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; margin-bottom: 0.5rem;">
+              Provides foundational skeletal mass, but excess leads to lethargy.
+            </p>
+            <div style="font-size: 0.78rem; color: #fff; background: rgba(255,255,255,0.04); padding: 0.4rem 0.6rem; border-radius: var(--radius-sm);">
+              <strong>Key Foods:</strong> Jowar/Bajra Bhakri, sprouted matki usal, ginger, black pepper.
+            </div>
+          </div>
+        </div>
+
+        <!-- Shad Rasa Principles -->
+        <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-primary);">
+          <i class="fa-solid fa-bowl-rice" style="color: #22c55e; margin-right: 0.35rem;"></i> The 6 Tastes (Shad Rasa) for Athletic Meal Completeness
+        </h4>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.25rem;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; font-size: 0.82rem;">
+            <div><strong style="color: #ff9f1a;">1. Madhura (Sweet):</strong> Whole grains, milk, rice (builds muscle mass)</div>
+            <div><strong style="color: #ef4444;">2. Amla (Sour):</strong> Taak, lemon, amla (promotes enzyme secretion)</div>
+            <div><strong style="color: #00d2ff;">3. Lavana (Salty):</strong> Rock salt / Sendha Namak (restores electrolytes)</div>
+            <div><strong style="color: #ff4757;">4. Katu (Pungent):</strong> Ginger, black pepper (boosts metabolism & Agni)</div>
+            <div><strong style="color: #22c55e;">5. Tikta (Bitter):</strong> Methi greens, turmeric (detoxifies & cleanses blood)</div>
+            <div><strong style="color: #a855f7;">6. Kashaya (Astringent):</strong> Sprouted lentils, triphala (promotes tissue recovery)</div>
+          </div>
+        </div>
+
+        <!-- Educational & Academic Disclaimer -->
+        <div style="padding: 0.85rem 1rem; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); font-size: 0.78rem; color: var(--text-muted); line-height: 1.4;">
+          <i class="fa-solid fa-circle-info" style="color: var(--primary); margin-right: 0.35rem;"></i>
+          <strong>Wellness Notice:</strong> Ayurvedic Balance provides traditional lifestyle and nutritional harmony principles for educational and athletic vitality. This content represents holistic dietary balance and does not constitute clinical medical diagnosis, prescription, or healthcare treatment.
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-close-modal>Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/diet.js"></script>
+</body>
+</html>
