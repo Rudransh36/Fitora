@@ -12,6 +12,11 @@ let isConnected = false;
 let memoryServer = null;
 
 const connectDB = async () => {
+  if (mongoose.connection && mongoose.connection.readyState >= 1) {
+    isConnected = true;
+    return mongoose.connection;
+  }
+
   const mongoURI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/fitora';
 
   try {
@@ -24,6 +29,13 @@ const connectDB = async () => {
     return conn;
   } catch (primaryError) {
     console.warn(`ℹ️  Standard MongoDB instance not reachable at ${mongoURI} (${primaryError.message})`);
+
+    if (process.env.VERCEL) {
+      console.warn('⚠️ Running on Vercel: Primary MongoDB connection failed. Please ensure MONGO_URI is set in Vercel settings.');
+      isConnected = false;
+      return null;
+    }
+
     console.log(`🚀 Starting high-speed embedded database instance with disk persistence...`);
 
     const dbDir = path.join(__dirname, '..', '.data', 'db');

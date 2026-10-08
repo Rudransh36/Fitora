@@ -50,6 +50,18 @@ app.use((err, req, res, next) => {
   });
 });
 
+// ─── Serverless Database Middleware (Vercel) ──────────────────────────────────
+if (process.env.VERCEL) {
+  app.use(async (req, res, next) => {
+    try {
+      await connectDB();
+    } catch (err) {
+      console.error('Serverless DB connect error:', err.message);
+    }
+    next();
+  });
+}
+
 // ─── Start Server ─────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
 
@@ -67,6 +79,8 @@ const startServer = async () => {
   });
 };
 
-startServer();
+if (!process.env.VERCEL) {
+  startServer();
+}
 
 module.exports = app;
