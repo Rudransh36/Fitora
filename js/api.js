@@ -9,7 +9,16 @@
  * User:     Cached in localStorage as 'Fitora_user' (JSON).
  */
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = (() => {
+  if (typeof window !== 'undefined' && window.location.protocol === 'file:') {
+    return 'http://localhost:5000/api';
+  }
+  const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+  if (isLocal && window.location.port !== '5000' && window.location.port !== '') {
+    return 'http://localhost:5000/api';
+  }
+  return '/api';
+})();
 
 // ─── Token Helpers ────────────────────────────────────────────────────────────
 
