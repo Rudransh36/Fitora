@@ -9,7 +9,20 @@
  * User:     Cached in localStorage as 'Fitora_user' (JSON).
  */
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = (function() {
+  if (typeof window !== 'undefined' && window.FITORA_API_URL) {
+    return window.FITORA_API_URL;
+  }
+  if (typeof window !== 'undefined' && window.location && window.location.origin) {
+    if (window.location.protocol.startsWith('http')) {
+      // If served directly from Express server (port 5000) or deployed web domain
+      if (window.location.port === '5000' || (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1')) {
+        return `${window.location.origin}/api`;
+      }
+    }
+  }
+  return 'http://localhost:5000/api';
+})();
 
 // ─── Token Helpers ────────────────────────────────────────────────────────────
 

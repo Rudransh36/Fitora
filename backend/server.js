@@ -11,8 +11,17 @@ app.use(cors({ origin: '*', credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Security guard: Prevent sensitive files and directories from being served
+app.use((req, res, next) => {
+  const p = req.path.toLowerCase();
+  if (p.includes('.env') || p.startsWith('/.git') || p.startsWith('/backend') || p.startsWith('/scratch')) {
+    return res.status(403).json({ success: false, message: 'Access forbidden.' });
+  }
+  next();
+});
+
 // Serve static frontend files from the parent directory
-app.use(express.static(path.join(__dirname, '..')));
+app.use(express.static(path.join(__dirname, '..'), { dotfiles: 'deny' }));
 
 // ─── API Routes ───────────────────────────────────────────────────────────────
 app.use('/api/auth',       require('./routes/authRoutes'));

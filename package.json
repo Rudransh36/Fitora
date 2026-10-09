@@ -1,0 +1,23 @@
+{
+  "name": "fitora",
+  "version": "1.0.0",
+  "description": "Fitora – Smart AI-Powered Fitness & Sports Monitoring Platform",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js",
+    "backend": "npm --prefix backend start",
+    "test": "node scratch/test_full_suite.js"
+  },
+  "keywords": [
+    "fitora",
+    "fitness",
+    "sports",
+    "gym",
+    "cricket",
+    "badminton",
+    "nutrition"
+  ],
+  "author": "Fitora Team",
+  "license": "ISC"
+}
