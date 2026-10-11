@@ -101,10 +101,75 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Explicitly select password for comparison
-    const user = await User.findOne({ email: email.toLowerCase().trim() }).select('+password');
+    const normalizedEmail = email.toLowerCase().trim();
+    const isDemoLogin = (normalizedEmail === 'alex@fitora.io' && password === 'athlete123');
+
+    const DEMO_USER_ID = '660e1a1a1a1a1a1a1a1a1a1a';
+    const DEMO_USER_DATA = {
+      id: DEMO_USER_ID,
+      name: 'Alex Mercer',
+      email: 'alex@fitora.io',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+      age: 24,
+      gender: 'Male',
+      height: 178,
+      weight: 74,
+      activityLevel: 'Very Active',
+      fitnessGoal: 'Sports performance',
+      selectedSport: 'Gym',
+      dietaryPreference: 'Vegetarian',
+      streakDays: 5
+    };
+
+    let user = null;
+    let dbConnected = false;
+
+    try {
+      const mongoose = require('mongoose');
+      dbConnected = mongoose.connection && mongoose.connection.readyState >= 1;
+
+      if (dbConnected) {
+        user = await User.findOne({ email: normalizedEmail }).select('+password');
+
+        // If demo credentials and user doesn't exist in DB yet, auto-create it now
+        if (!user && isDemoLogin) {
+          user = await User.create({
+            name: 'Alex Mercer',
+            email: 'alex@fitora.io',
+            password: 'athlete123',
+            age: 24,
+            gender: 'Male',
+            height: 178,
+            weight: 74,
+            activityLevel: 'Very Active',
+            fitnessGoal: 'Sports performance',
+            selectedSport: 'Gym',
+            dietaryPreference: 'Vegetarian'
+          });
+        }
+      }
+    } catch (dbErr) {
+      console.warn('Database query notice in /login:', dbErr.message);
+    }
+
+    // If database is disconnected or unreachable but user used valid demo credentials
+    if (!user && isDemoLogin) {
+      const token = generateToken(DEMO_USER_ID);
+      return res.json({
+        success: true,
+        message: 'Welcome back, Alex! 💪 (Demo Athlete)',
+        token,
+        user: DEMO_USER_DATA
+      });
+    }
 
     if (!user) {
+      if (!dbConnected) {
+        return res.status(503).json({
+          success: false,
+          message: 'Database is connecting. For instant access, use the "1-Click Demo" button.'
+        });
+      }
       return res.status(401).json({
         success: false,
         message: 'No account found with this email address.'
@@ -302,22 +367,46 @@ router.get('/google/callback', async (req, res) => {
     }
 
     // Find or create athlete user
-    let user = await User.findOne({ email: profile.email.toLowerCase() });
+    let user = null;
+    const mongoose = require('mongoose');
+    const isDbConnected = mongoose.connection && mongoose.connection.readyState >= 1;
+
+    if (isDbConnected) {
+      try {
+        user = await User.findOne({ email: profile.email.toLowerCase() });
+        if (!user) {
+          user = await User.create({
+            name: profile.name || 'Google Athlete',
+            email: profile.email.toLowerCase(),
+            password: 'OAuth_Google_' + Math.random().toString(36).slice(-12),
+            avatar: profile.picture || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+            age: 24,
+            gender: 'Male',
+            height: 175,
+            weight: 72,
+            activityLevel: 'Moderately Active',
+            fitnessGoal: 'Sports performance',
+            selectedSport: 'Gym',
+            dietaryPreference: 'Vegetarian'
+          });
+        }
+      } catch (dbErr) {
+        console.warn('Google OAuth DB save notice:', dbErr.message);
+      }
+    }
+
     if (!user) {
-      user = await User.create({
+      // Fallback athlete user object when database is not yet connected
+      const crypto = require('crypto');
+      const fallbackId = crypto.createHash('md5').update(profile.email.toLowerCase()).digest('hex').slice(0, 24);
+      user = {
+        _id: fallbackId,
         name: profile.name || 'Google Athlete',
         email: profile.email.toLowerCase(),
-        password: 'OAuth_Google_' + Math.random().toString(36).slice(-12),
         avatar: profile.picture || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
-        age: 24,
-        gender: 'Male',
-        height: 175,
-        weight: 72,
-        activityLevel: 'Moderately Active',
-        fitnessGoal: 'Sports performance',
         selectedSport: 'Gym',
-        dietaryPreference: 'Vegetarian'
-      });
+        fitnessGoal: 'Sports performance'
+      };
     }
 
     const token = generateToken(user._id);

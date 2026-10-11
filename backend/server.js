@@ -32,10 +32,16 @@ app.use((req, res, next) => {
 app.use(express.static(path.join(__dirname, '..'), { dotfiles: 'deny' }));
 
 // ─── Database Middleware (Ensures connection before API calls) ────────────────
+let dbSeeded = false;
 app.use(async (req, res, next) => {
   if (req.path.startsWith('/api') && req.path !== '/api/health') {
     try {
-      await connectDB();
+      const conn = await connectDB();
+      if (conn && !dbSeeded) {
+        dbSeeded = true;
+        const { seedDefaultData } = require('./utils/seedData');
+        seedDefaultData().catch(() => {});
+      }
     } catch (err) {
       console.error('DB connect error:', err.message);
     }

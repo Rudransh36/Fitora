@@ -38,19 +38,32 @@ router.get('/', protect, async (req, res) => {
     }
 
     // Parallel queries scoped strictly to this userId
-    const [
-      rangeWorkouts,
-      cricketSessions,
-      badmintonSessions,
-      todayWaterDoc,
-      calendarEvents
-    ] = await Promise.all([
-      Workout.find({ user: userId, date: { $gte: rangeStart, $lte: rangeEnd } }).sort({ date: -1 }),
-      CricketTraining.find({ user: userId, date: { $gte: rangeStart, $lte: rangeEnd } }).sort({ date: -1 }),
-      BadmintonTraining.find({ user: userId, date: { $gte: rangeStart, $lte: rangeEnd } }).sort({ date: -1 }),
-      WaterIntake.findOne({ user: userId, date: { $gte: startOfToday, $lte: endOfToday } }),
-      CalendarEvent.find({ user: userId, date: { $gte: rangeStart, $lte: rangeEnd } })
-    ]);
+    let rangeWorkouts = [];
+    let cricketSessions = [];
+    let badmintonSessions = [];
+    let todayWaterDoc = null;
+    let calendarEvents = [];
+
+    const mongoose = require('mongoose');
+    if (mongoose.connection && mongoose.connection.readyState >= 1) {
+      try {
+        [
+          rangeWorkouts,
+          cricketSessions,
+          badmintonSessions,
+          todayWaterDoc,
+          calendarEvents
+        ] = await Promise.all([
+          Workout.find({ user: userId, date: { $gte: rangeStart, $lte: rangeEnd } }).sort({ date: -1 }),
+          CricketTraining.find({ user: userId, date: { $gte: rangeStart, $lte: rangeEnd } }).sort({ date: -1 }),
+          BadmintonTraining.find({ user: userId, date: { $gte: rangeStart, $lte: rangeEnd } }).sort({ date: -1 }),
+          WaterIntake.findOne({ user: userId, date: { $gte: startOfToday, $lte: endOfToday } }),
+          CalendarEvent.find({ user: userId, date: { $gte: rangeStart, $lte: rangeEnd } })
+        ]);
+      } catch (dbErr) {
+        console.warn('Dashboard DB query notice:', dbErr.message);
+      }
+    }
 
     // ── Calories — strictly from real records, zero if no data ──────────────────
     const gymCalories = rangeWorkouts.reduce((s, w) => s + (w.estimatedCaloriesBurned || 0), 0);

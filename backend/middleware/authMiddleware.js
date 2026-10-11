@@ -31,7 +31,36 @@ const protect = async (req, res, next) => {
       }
 
       // Attach user from database (excluding password)
-      req.user = await User.findById(decoded.id).select('-password');
+      const DEMO_USER_ID = '660e1a1a1a1a1a1a1a1a1a1a';
+      const DEMO_USER = {
+        _id: DEMO_USER_ID,
+        id: DEMO_USER_ID,
+        name: 'Alex Mercer',
+        email: 'alex@fitora.io',
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+        age: 24,
+        gender: 'Male',
+        height: 178,
+        weight: 74,
+        activityLevel: 'Very Active',
+        fitnessGoal: 'Sports performance',
+        selectedSport: 'Gym',
+        dietaryPreference: 'Vegetarian',
+        streakDays: 5
+      };
+
+      const mongoose = require('mongoose');
+      if (mongoose.connection && mongoose.connection.readyState >= 1) {
+        try {
+          req.user = await User.findById(decoded.id).select('-password');
+        } catch (dbErr) {
+          console.warn('DB User lookup notice:', dbErr.message);
+        }
+      }
+
+      if (!req.user && String(decoded.id) === DEMO_USER_ID) {
+        req.user = DEMO_USER;
+      }
 
       if (!req.user) {
         return res.status(401).json({

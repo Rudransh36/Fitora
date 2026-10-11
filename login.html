@@ -276,11 +276,12 @@
       }
     });
 
-    // 1-Click Demo: auto-create demo account if it doesn't exist
-    document.getElementById("fillDemoCredsBtn").addEventListener("click", async () => {
+    // 1-Click Demo: auto-fill and log in directly
+    document.getElementById("fillDemoCredsBtn").addEventListener("click", () => {
       document.getElementById("loginEmail").value    = "alex@Fitora.io";
       document.getElementById("loginPassword").value = "athlete123";
-      Fitora.showToast("Demo credentials filled! Click Sign In.", "info");
+      Fitora.showToast("Logging in with demo credentials...", "info");
+      document.getElementById("loginForm").requestSubmit();
     });
 
     // Real OAuth check & guidance
