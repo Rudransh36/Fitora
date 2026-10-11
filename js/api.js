@@ -9,19 +9,25 @@
  * User:     Cached in localStorage as 'Fitora_user' (JSON).
  */
 
-const API_BASE = (function() {
+const API_BASE = (() => {
+  // Allow override via global variable (useful for testing or custom deployments)
   if (typeof window !== 'undefined' && window.FITORA_API_URL) {
     return window.FITORA_API_URL;
   }
-  if (typeof window !== 'undefined' && window.location && window.location.origin) {
-    if (window.location.protocol.startsWith('http')) {
-      // If served directly from Express server (port 5000) or deployed web domain
-      if (window.location.port === '5000' || (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1')) {
-        return `${window.location.origin}/api`;
-      }
+  // file:// protocol — direct file open, must use explicit localhost
+  if (typeof window !== 'undefined' && window.location.protocol === 'file:') {
+    return 'http://localhost:5000/api';
+  }
+  // Localhost dev on a different port (Live Server, Vite, etc.) → proxy to :5000
+  if (typeof window !== 'undefined') {
+    const h = window.location.hostname;
+    const isLocal = h === 'localhost' || h === '127.0.0.1';
+    if (isLocal && window.location.port !== '5000' && window.location.port !== '') {
+      return 'http://localhost:5000/api';
     }
   }
-  return 'http://localhost:5000/api';
+  // All other cases: same-origin (served from Express on :5000 or any deployed domain)
+  return '/api';
 })();
 
 // ─── Token Helpers ────────────────────────────────────────────────────────────
