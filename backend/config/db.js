@@ -44,8 +44,8 @@ const connectDB = async () => {
     // connection resolves, which is the correct behavior for serverless where
     // the connect() call and the query may be microseconds apart.
 
-    if (!mongoURI) {
-      console.warn('⚠️ MONGO_URI is not set in Vercel Environment Variables. Please add it in Vercel → Settings → Environment Variables.');
+    if (!mongoURI || mongoURI.includes('127.0.0.1') || mongoURI.includes('localhost')) {
+      console.warn('⚠️ MONGO_URI is not set or is pointing to localhost (127.0.0.1) on Vercel. Add your MongoDB Atlas connection string (mongodb+srv://...) in Vercel → Settings → Environment Variables.');
       isConnected = false;
       return null;
     }
