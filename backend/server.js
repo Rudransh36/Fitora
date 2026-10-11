@@ -50,14 +50,27 @@ app.use(async (req, res, next) => {
 });
 
 // ─── Health Check & API Status ────────────────────────────────────────────────
-app.get('/api/health', (req, res) => {
-  const { getDBStatus } = require('./config/db');
+app.get('/api/health', async (req, res) => {
+  const { getDBStatus, connectDB } = require('./config/db');
+  let connError = null;
+  try {
+    await connectDB();
+  } catch (e) {
+    connError = e.message;
+  }
+
+  const rawUri = process.env.MONGO_URI || '';
+  const uriHost = rawUri ? (rawUri.includes('@') ? rawUri.split('@')[1] : rawUri.replace(/^mongodb(\+srv)?:\/\//, '')) : 'NOT_SET';
+
   res.json({
     success: true,
     message: '✅ Fitora API is live and running',
     timestamp: new Date().toISOString(),
     version: '1.0.0',
-    database: getDBStatus() ? 'Connected' : 'Disconnected (configure MONGO_URI in Vercel)',
+    database: getDBStatus() ? 'Connected' : 'Disconnected',
+    dbHost: uriHost,
+    hasMongoUri: !!rawUri,
+    connError: connError,
     isVercel: !!process.env.VERCEL
   });
 });
