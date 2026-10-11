@@ -32,10 +32,26 @@ router.get('/', protect, async (req, res) => {
 router.post('/generate', protect, async (req, res) => {
   try {
     if (req.body && req.body.dietaryPreference) {
-      req.user.dietaryPreference = req.body.dietaryPreference;
+      let dp = String(req.body.dietaryPreference).trim();
+      const lower = dp.toLowerCase();
+      if (lower === 'vegetarian') dp = 'Vegetarian';
+      else if (lower === 'eggetarian') dp = 'Eggetarian';
+      else if (lower.includes('non')) dp = 'Non-Vegetarian';
+
+      req.user.dietaryPreference = dp;
       if (req.body.sport) req.user.selectedSport = req.body.sport;
       if (req.body.fitnessGoal) req.user.fitnessGoal = req.body.fitnessGoal;
-      await req.user.save();
+
+      if (typeof req.user.save === 'function') {
+        await req.user.save();
+      } else {
+        const User = require('../models/User');
+        await User.findByIdAndUpdate(req.user._id, {
+          dietaryPreference: dp,
+          ...(req.body.sport && { selectedSport: req.body.sport }),
+          ...(req.body.fitnessGoal && { fitnessGoal: req.body.fitnessGoal })
+        }).catch(() => {});
+      }
     }
     // Delete old plan and regenerate
     await DietPlan.deleteMany({ user: req.user._id });

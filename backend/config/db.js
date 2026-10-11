@@ -4,20 +4,34 @@ const fs = require('fs');
 
 /**
  * Robust MongoDB Connection Manager
- * 1. Tries primary connection string (e.g., local MongoDB service or MongoDB Atlas).
- * 2. If no MongoDB server is running locally, it gracefully starts an embedded MongoMemoryServer
- *    configured with disk persistence (.data/db) so data, users, and workouts survive restarts.
+ *
+ * KEY FIX: On Vercel (serverless), each cold-start invocation initialises
+ * from scratch. We previously set `bufferCommands = false`, which meant
+ * ANY Mongoose query that ran before `mongoose.connect()` fully resolved
+ * would throw immediately — causing "Cannot call findOne() before initial
+ * connection is complete" errors for EVERY diet/gym/cricket/badminton route.
+ *
+ * Solution:
+ * 1. Remove the global `bufferCommands = false` so Mongoose queues commands
+ *    while the connection is being established.
+ * 2. Cache the connection promise so concurrent requests reuse the same
+ *    connection attempt instead of hammering Atlas with multiple connects.
+ * 3. Increase the serverSelectionTimeout to 10 s so Atlas has enough time
+ *    to wake up on the first cold-start request.
  */
+
 let isConnected = false;
 let memoryServer = null;
 let cachedPromise = null;
 
 const connectDB = async () => {
+  // Already connected — return immediately
   if (mongoose.connection && mongoose.connection.readyState >= 1) {
     isConnected = true;
     return mongoose.connection;
   }
 
+  // A connection attempt is already in flight — wait for it
   if (cachedPromise) {
     return cachedPromise;
   }
@@ -25,11 +39,13 @@ const connectDB = async () => {
   const mongoURI = process.env.MONGO_URI;
 
   if (process.env.VERCEL) {
-    // In serverless environments, don't buffer commands when disconnected
-    mongoose.set('bufferCommands', false);
+    // NOTE: Do NOT set bufferCommands = false here.
+    // Mongoose's default (bufferCommands = true) queues commands until the
+    // connection resolves, which is the correct behavior for serverless where
+    // the connect() call and the query may be microseconds apart.
 
     if (!mongoURI) {
-      console.warn('⚠️ Running on Vercel: MONGO_URI is not configured in Environment Variables. Please set MONGO_URI in Vercel Project Settings.');
+      console.warn('⚠️ MONGO_URI is not set in Vercel Environment Variables. Please add it in Vercel → Settings → Environment Variables.');
       isConnected = false;
       return null;
     }
@@ -40,23 +56,28 @@ const connectDB = async () => {
   cachedPromise = (async () => {
     try {
       const conn = await mongoose.connect(uriToUse, {
-        serverSelectionTimeoutMS: 5000,
+        // Allow up to 10 s for Atlas to accept the first connection on cold-start
+        serverSelectionTimeoutMS: 10000,
+        // Keep the connection alive across Vercel's reused function instances
+        maxPoolSize: 10,
+        socketTimeoutMS: 45000,
       });
 
       isConnected = true;
       console.log(`✅ Connected to MongoDB at: ${conn.connection.host}`);
       return conn;
     } catch (primaryError) {
-      console.warn(`ℹ️ MongoDB connection not reachable (${primaryError.message})`);
+      console.warn(`ℹ️ MongoDB connection failed (${primaryError.message})`);
 
       if (process.env.VERCEL) {
-        console.warn('⚠️ Running on Vercel: Primary MongoDB connection failed. Please ensure MONGO_URI is valid in Vercel settings.');
+        console.warn('⚠️ Atlas connection failed on Vercel. Check that MONGO_URI is correct and your Atlas cluster IP allowlist includes 0.0.0.0/0.');
         isConnected = false;
-        cachedPromise = null;
+        cachedPromise = null;  // allow retry on next request
         return null;
       }
 
-      console.log(`🚀 Starting high-speed embedded database instance with disk persistence...`);
+      // ── Local-only fallback: embedded MongoMemoryServer with disk persistence ──
+      console.log('🚀 Starting embedded MongoDB with disk persistence for local development...');
 
       const dbDir = path.join(__dirname, '..', '.data', 'db');
       if (!fs.existsSync(dbDir)) {
@@ -73,14 +94,13 @@ const connectDB = async () => {
           }
         });
         const memUri = memoryServer.getUri('fitora');
-
         const conn = await mongoose.connect(memUri);
         isConnected = true;
         console.log(`✅ Persistent embedded MongoDB active at: ${memUri}`);
         console.log(`📁 Database files saved to: ${dbDir}`);
         return conn;
       } catch (memError) {
-        console.warn(`⚠️ Persistent embedded MongoDB warning: ${memError.message}. Starting fallback in-memory instance...`);
+        console.warn(`⚠️ Persistent embedded MongoDB warning: ${memError.message}. Trying in-memory fallback...`);
         try {
           const { MongoMemoryServer } = require('mongodb-memory-server');
           memoryServer = await MongoMemoryServer.create({

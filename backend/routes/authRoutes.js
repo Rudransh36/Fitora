@@ -16,12 +16,17 @@ const User = require('../models/User');
 const generateToken = (id, profile = {}) => {
   const payload = { id };
   // Embed lightweight user data for JWT fallback (keeps token small)
-  if (profile.name)   payload.name   = profile.name;
-  if (profile.email)  payload.email  = profile.email;
-  if (profile.avatar) payload.avatar = profile.avatar;
-  if (profile.selectedSport)  payload.selectedSport  = profile.selectedSport;
-  if (profile.fitnessGoal)    payload.fitnessGoal    = profile.fitnessGoal;
-  if (profile.activityLevel)  payload.activityLevel  = profile.activityLevel;
+  if (profile.name)              payload.name              = profile.name;
+  if (profile.email)             payload.email             = profile.email;
+  if (profile.avatar)            payload.avatar            = profile.avatar;
+  if (profile.selectedSport)     payload.selectedSport     = profile.selectedSport;
+  if (profile.fitnessGoal)       payload.fitnessGoal       = profile.fitnessGoal;
+  if (profile.activityLevel)     payload.activityLevel     = profile.activityLevel;
+  if (profile.dietaryPreference) payload.dietaryPreference = profile.dietaryPreference;
+  if (profile.age)               payload.age               = profile.age;
+  if (profile.gender)            payload.gender            = profile.gender;
+  if (profile.height)            payload.height            = profile.height;
+  if (profile.weight)            payload.weight            = profile.weight;
   return jwt.sign(
     payload,
     process.env.JWT_SECRET || 'Fitora_super_secret_jwt_key_2026_sports_platform',
@@ -73,7 +78,7 @@ router.post('/register', async (req, res) => {
       dietaryPreference: dietaryPreference || 'Vegetarian'
     });
 
-    const token = generateToken(user._id);
+    const token = generateToken(user._id, user);
 
     res.status(201).json({
       success: true,
@@ -199,7 +204,7 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    const token = generateToken(user._id);
+    const token = generateToken(user._id, user);
 
     res.json({
       success: true,
@@ -431,7 +436,12 @@ router.get('/google/callback', async (req, res) => {
       email: user.email,
       avatar: user.avatar,
       selectedSport: user.selectedSport,
-      fitnessGoal: user.fitnessGoal
+      fitnessGoal: user.fitnessGoal,
+      dietaryPreference: user.dietaryPreference || 'Vegetarian',
+      age: user.age,
+      gender: user.gender,
+      height: user.height,
+      weight: user.weight
     });
 
     const userPayload = encodeURIComponent(JSON.stringify({
@@ -440,7 +450,8 @@ router.get('/google/callback', async (req, res) => {
       email: user.email,
       avatar: user.avatar,
       selectedSport: user.selectedSport,
-      fitnessGoal: user.fitnessGoal
+      fitnessGoal: user.fitnessGoal,
+      dietaryPreference: user.dietaryPreference || 'Vegetarian'
     }));
 
     // Redirect to frontend with auth payload
@@ -493,7 +504,7 @@ router.post('/oauth/google', async (req, res) => {
       });
     }
 
-    const token = generateToken(user._id);
+    const token = generateToken(user._id, user);
 
     res.json({
       success: true,
