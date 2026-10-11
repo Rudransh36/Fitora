@@ -201,18 +201,32 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Render current user details from localStorage (set on login/register)
-  const storedUser = JSON.parse(localStorage.getItem("Fitora_user") || "null");
-  if (storedUser) {
+  // Render current user details from localStorage (or auto-fetch on OAuth return)
+  const applyUserDetails = (user) => {
+    if (!user) return;
     document.querySelectorAll(".sidebar-user-name, .topbar-user-name").forEach(el => {
-      el.textContent = storedUser.name || 'Athlete';
+      el.textContent = user.name || 'Athlete';
     });
     document.querySelectorAll(".sidebar-user-role").forEach(el => {
-      el.textContent = storedUser.fitnessGoal || storedUser.selectedSport || 'Fitora Athlete';
+      el.textContent = user.fitnessGoal || user.selectedSport || 'Fitora Athlete';
     });
     document.querySelectorAll(".sidebar-user-avatar, .user-profile-avatar").forEach(el => {
-      if (storedUser.avatar) el.src = storedUser.avatar;
+      if (user.avatar) el.src = user.avatar;
     });
+  };
+
+  const storedUser = JSON.parse(localStorage.getItem("Fitora_user") || "null");
+  if (storedUser) {
+    applyUserDetails(storedUser);
+  } else if (localStorage.getItem("Fitora_token")) {
+    if (window.Fitora && Fitora.Auth && typeof Fitora.Auth.getMe === 'function') {
+      Fitora.Auth.getMe().then(res => {
+        if (res && res.user) {
+          Fitora.setStoredUser(res.user);
+          applyUserDetails(res.user);
+        }
+      }).catch(() => {});
+    }
   }
 
   // Logout

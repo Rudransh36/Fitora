@@ -159,13 +159,38 @@ router.get('/me', protect, async (req, res) => {
   });
 });
 
+/**
+ * Resolves the appropriate Google OAuth callback URL.
+ * Automatically adapts between localhost (http://localhost:5000/api/auth/google/callback)
+ * and deployed production (https://<host>/api/auth/google/callback).
+ */
+function getGoogleCallbackUrl(req) {
+  const rawHost = (req.headers['x-forwarded-host'] || req.get('host') || 'localhost:5000').split(',')[0].trim();
+  const isLocal = rawHost.includes('localhost') || rawHost.includes('127.0.0.1');
+
+  // Production must always use https for Google OAuth; local uses http
+  const rawProto = (req.headers['x-forwarded-proto'] || req.protocol || 'http').split(',')[0].trim();
+  const proto = isLocal ? 'http' : (rawProto === 'https' ? 'https' : 'https');
+
+  const configured = process.env.GOOGLE_CALLBACK_URL;
+  if (configured) {
+    const isConfigLocal = configured.includes('localhost') || configured.includes('127.0.0.1');
+    if (isLocal && isConfigLocal) return configured;
+    if (!isLocal && !isConfigLocal) return configured;
+  }
+
+  return `${proto}://${rawHost}/api/auth/google/callback`;
+}
+
 // ─── GET /api/auth/google/status ──────────────────────────────────────────────
 router.get('/google/status', (req, res) => {
   const configured = !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
+  const callbackUrl = getGoogleCallbackUrl(req);
   res.json({
     success: true,
     configured,
-    clientId: process.env.GOOGLE_CLIENT_ID || null
+    clientId: process.env.GOOGLE_CLIENT_ID || null,
+    callbackUrl
   });
 });
 
@@ -184,7 +209,7 @@ router.get('/apple/status', (req, res) => {
 router.get('/google', (req, res) => {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-  const redirectUri = process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/auth/google/callback';
+  const redirectUri = getGoogleCallbackUrl(req);
 
   if (!clientId || !clientSecret) {
     return res.status(400).json({
@@ -204,24 +229,49 @@ router.get('/google', (req, res) => {
     });
   }
 
+  // Preserve frontend return destination (origin) via state parameter
+  let returnTo = req.query.origin || req.query.return_to || '';
+  if (!returnTo && req.headers.referer) {
+    try {
+      returnTo = new URL(req.headers.referer).origin;
+    } catch (_) {}
+  }
+
+  const statePayload = {
+    callbackUrl: redirectUri,
+    returnTo: returnTo || ''
+  };
+  const state = Buffer.from(JSON.stringify(statePayload)).toString('base64url');
+
   const scope = encodeURIComponent('openid email profile');
-  const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${scope}&access_type=offline&prompt=consent`;
+  const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${scope}&access_type=offline&prompt=consent&state=${encodeURIComponent(state)}`;
   res.redirect(googleAuthUrl);
 });
 
 // ─── GET /api/auth/google/callback ────────────────────────────────────────────
 // Google OAuth Redirect Callback
 router.get('/google/callback', async (req, res) => {
-  const { code, error } = req.query;
+  const { code, state, error } = req.query;
+
+  let statePayload = {};
+  if (state) {
+    try {
+      statePayload = JSON.parse(Buffer.from(state, 'base64url').toString('utf8'));
+    } catch (_) {}
+  }
+
+  const frontendBase = statePayload.returnTo || '';
 
   if (error || !code) {
-    return res.redirect(`/login.html?error=${encodeURIComponent(error || 'Google authorization cancelled')}`);
+    const errorTarget = frontendBase ? `${frontendBase}/login.html` : '/login.html';
+    return res.redirect(`${errorTarget}?error=${encodeURIComponent(error || 'Google authorization cancelled')}`);
   }
 
   try {
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-    const redirectUri = process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/auth/google/callback';
+    // MUST use the exact redirectUri that was sent in authorization request
+    const redirectUri = statePayload.callbackUrl || getGoogleCallbackUrl(req);
 
     // Exchange authorization code for access token
     const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
@@ -238,7 +288,7 @@ router.get('/google/callback', async (req, res) => {
 
     const tokenData = await tokenResponse.json();
     if (!tokenResponse.ok || !tokenData.access_token) {
-      throw new Error(tokenData.error_description || 'Failed to exchange token with Google');
+      throw new Error(tokenData.error_description || tokenData.error || 'Failed to exchange token with Google');
     }
 
     // Fetch user info from Google API
@@ -272,11 +322,22 @@ router.get('/google/callback', async (req, res) => {
 
     const token = generateToken(user._id);
 
+    const userPayload = encodeURIComponent(JSON.stringify({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      avatar: user.avatar,
+      selectedSport: user.selectedSport,
+      fitnessGoal: user.fitnessGoal
+    }));
+
     // Redirect to frontend with auth payload
-    res.redirect(`/index.html?token=${encodeURIComponent(token)}&provider=google`);
+    const successTarget = frontendBase ? `${frontendBase}/index.html` : '/index.html';
+    res.redirect(`${successTarget}?token=${encodeURIComponent(token)}&provider=google&user=${userPayload}`);
   } catch (err) {
     console.error('Google OAuth Callback Error:', err.message);
-    res.redirect(`/login.html?error=${encodeURIComponent(err.message)}`);
+    const errorTarget = frontendBase ? `${frontendBase}/login.html` : '/login.html';
+    res.redirect(`${errorTarget}?error=${encodeURIComponent(err.message)}`);
   }
 });
 
@@ -295,6 +356,11 @@ router.post('/oauth/google', async (req, res) => {
 
     if (!verifyRes.ok || !tokenInfo.email) {
       return res.status(401).json({ success: false, message: 'Invalid Google identity token' });
+    }
+
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    if (clientId && tokenInfo.aud && tokenInfo.aud !== clientId) {
+      return res.status(401).json({ success: false, message: 'Google ID token audience mismatch' });
     }
 
     let user = await User.findOne({ email: tokenInfo.email.toLowerCase() });

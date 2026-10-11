@@ -8,13 +8,16 @@ const app = express();
 
 const fs = require('fs');
 
+// Trust reverse proxies (Vercel, Render, Railway, Heroku, Cloudflare) for accurate HTTPS detection
+app.set('trust proxy', 1);
+
 // ─── Middleware ───────────────────────────────────────────────────────────────
-app.use(cors({ origin: '*', credentials: true }));
+app.use(cors({
+  origin: (origin, callback) => callback(null, true),
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Trust reverse proxies (Render, Railway, Heroku, Cloudflare) for accurate HTTPS detection
-app.set('trust proxy', 1);
 
 // Security guard: Prevent sensitive files and directories from being served
 app.use((req, res, next) => {
@@ -112,7 +115,7 @@ const startServer = async () => {
   });
 };
 
-if (!process.env.VERCEL) {
+if (!process.env.VERCEL && process.env.NODE_ENV !== 'test') {
   startServer();
 }
 

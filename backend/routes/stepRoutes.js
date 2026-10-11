@@ -166,12 +166,31 @@ router.get('/google/status', async (req, res) => {
   });
 });
 
+/**
+ * Resolves the appropriate Google Fit OAuth callback URL.
+ * Automatically adapts between localhost and deployed production.
+ */
+function getGoogleFitCallbackUrl(req) {
+  const rawHost = (req.headers['x-forwarded-host'] || req.get('host') || 'localhost:5000').split(',')[0].trim();
+  const isLocal = rawHost.includes('localhost') || rawHost.includes('127.0.0.1');
+  const rawProto = (req.headers['x-forwarded-proto'] || req.protocol || 'http').split(',')[0].trim();
+  const proto = isLocal ? 'http' : (rawProto === 'https' ? 'https' : 'https');
+
+  const configured = process.env.GOOGLE_FIT_REDIRECT_URI;
+  if (configured) {
+    const isConfigLocal = configured.includes('localhost') || configured.includes('127.0.0.1');
+    if (isLocal && isConfigLocal) return configured;
+    if (!isLocal && !isConfigLocal) return configured;
+  }
+  return `${proto}://${rawHost}/api/steps/google/callback`;
+}
+
 // ─── GET /api/steps/google/auth ───────────────────────────────────────────────
 // Initiates the official Google Health / Google Fit authorization flow
 router.get('/google/auth', protect, async (req, res) => {
   const clientId = process.env.GOOGLE_FIT_CLIENT_ID || process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_FIT_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET;
-  const redirectUri = process.env.GOOGLE_FIT_REDIRECT_URI || 'http://localhost:5000/api/steps/google/callback';
+  const redirectUri = getGoogleFitCallbackUrl(req);
 
   if (!clientId || !clientSecret) {
     return res.status(400).json({
@@ -191,9 +210,15 @@ router.get('/google/auth', protect, async (req, res) => {
     });
   }
 
+  // Preserve frontend return destination (origin) via state token
+  let returnTo = req.query.origin || '';
+  if (!returnTo && req.headers.referer) {
+    try { returnTo = new URL(req.headers.referer).origin; } catch (_) {}
+  }
+
   // Create state token containing user ID for verification in callback
   const state = jwt.sign(
-    { userId: req.user._id.toString() },
+    { userId: req.user._id.toString(), callbackUrl: redirectUri, returnTo },
     process.env.JWT_SECRET || 'Fitora_super_secret_jwt_key_2026_sports_platform',
     { expiresIn: '15m' }
   );
@@ -217,24 +242,38 @@ router.get('/google/auth', protect, async (req, res) => {
 router.get('/google/callback', async (req, res) => {
   const { code, state, error } = req.query;
 
+  let decodedState = {};
+  try {
+    if (state) {
+      decodedState = jwt.verify(
+        state,
+        process.env.JWT_SECRET || 'Fitora_super_secret_jwt_key_2026_sports_platform'
+      );
+    }
+  } catch (_) {}
+
+  const frontendBase = decodedState.returnTo || '';
+
   if (error || !code) {
-    return res.redirect(`/index.html?googleFitError=${encodeURIComponent(error || 'Authorization cancelled')}`);
+    const errorTarget = frontendBase ? `${frontendBase}/index.html` : '/index.html';
+    return res.redirect(`${errorTarget}?googleFitError=${encodeURIComponent(error || 'Authorization cancelled')}`);
   }
 
   try {
-    // Decode state to get authenticated user
-    const decoded = jwt.verify(
-      state,
-      process.env.JWT_SECRET || 'Fitora_super_secret_jwt_key_2026_sports_platform'
-    );
-    const user = await User.findById(decoded.userId).select('+googleFit.accessToken +googleFit.refreshToken');
+    if (!decodedState.userId) {
+      const errorTarget = frontendBase ? `${frontendBase}/index.html` : '/index.html';
+      return res.redirect(`${errorTarget}?googleFitError=Invalid%20state%20session`);
+    }
+
+    const user = await User.findById(decodedState.userId).select('+googleFit.accessToken +googleFit.refreshToken');
     if (!user) {
-      return res.redirect('/index.html?googleFitError=User%20not%20found');
+      const errorTarget = frontendBase ? `${frontendBase}/index.html` : '/index.html';
+      return res.redirect(`${errorTarget}?googleFitError=User%20not%20found`);
     }
 
     const clientId = process.env.GOOGLE_FIT_CLIENT_ID || process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_FIT_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET;
-    const redirectUri = process.env.GOOGLE_FIT_REDIRECT_URI || 'http://localhost:5000/api/steps/google/callback';
+    const redirectUri = decodedState.callbackUrl || getGoogleFitCallbackUrl(req);
 
     // Exchange authorization code for Google access token
     const tokenRes = await fetch('https://oauth2.googleapis.com/token', {

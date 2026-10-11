@@ -24,9 +24,15 @@
     (function() {
       const _urlParams = new URLSearchParams(window.location.search);
       const _token = _urlParams.get('token');
+      const _user = _urlParams.get('user');
       if (_token) {
         localStorage.setItem('Fitora_token', _token);
-        // Clean the token from the URL immediately so it is never visible
+        if (_user) {
+          try {
+            localStorage.setItem('Fitora_user', decodeURIComponent(_user));
+          } catch (_) {}
+        }
+        // Clean auth parameters from the URL immediately so they are never exposed
         history.replaceState({}, document.title, window.location.pathname);
       } else if (!localStorage.getItem('Fitora_token')) {
         const path = (window.location.pathname || '').toLowerCase();
