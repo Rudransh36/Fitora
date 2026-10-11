@@ -4,11 +4,26 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 /**
- * Generate a signed JWT for the given user ID.
+ * Generate a signed JWT.
+ * Optionally embed lightweight profile fields in the payload so
+ * authMiddleware can use them as a session fallback when MongoDB is
+ * cold-starting (Vercel serverless). This prevents auto-logout on
+ * the first request after a new deployment.
+ *
+ * @param {string|ObjectId} id  - MongoDB user _id
+ * @param {Object} [profile={}] - optional extra fields to embed
  */
-const generateToken = (id) => {
+const generateToken = (id, profile = {}) => {
+  const payload = { id };
+  // Embed lightweight user data for JWT fallback (keeps token small)
+  if (profile.name)   payload.name   = profile.name;
+  if (profile.email)  payload.email  = profile.email;
+  if (profile.avatar) payload.avatar = profile.avatar;
+  if (profile.selectedSport)  payload.selectedSport  = profile.selectedSport;
+  if (profile.fitnessGoal)    payload.fitnessGoal    = profile.fitnessGoal;
+  if (profile.activityLevel)  payload.activityLevel  = profile.activityLevel;
   return jwt.sign(
-    { id },
+    payload,
     process.env.JWT_SECRET || 'Fitora_super_secret_jwt_key_2026_sports_platform',
     { expiresIn: process.env.JWT_EXPIRE || '30d' }
   );
@@ -409,7 +424,15 @@ router.get('/google/callback', async (req, res) => {
       };
     }
 
-    const token = generateToken(user._id);
+    // Embed profile in JWT so authMiddleware can use it as a fallback
+    // if the DB is cold-starting on the next request
+    const token = generateToken(user._id, {
+      name: user.name,
+      email: user.email,
+      avatar: user.avatar,
+      selectedSport: user.selectedSport,
+      fitnessGoal: user.fitnessGoal
+    });
 
     const userPayload = encodeURIComponent(JSON.stringify({
       id: user._id,

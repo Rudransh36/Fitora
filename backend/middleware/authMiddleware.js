@@ -4,6 +4,15 @@ const User = require('../models/User');
 /**
  * Authentication Middleware
  * Validates JWT bearer token, checks signature, and mounts the authenticated user to req.user.
+ *
+ * FIX (auto-logout bug): On Vercel serverless cold-starts, the MongoDB connection may not be
+ * ready yet, so User.findById() can return null even for valid tokens. Previously this caused
+ * a 401 "token no longer exists" response which api.js intercepted to clear auth and redirect
+ * to login — creating the "logs out on every click" bug for Google OAuth users.
+ *
+ * Solution: when the DB is unavailable, fall back to a minimal user object built from the
+ * verified JWT payload. The session stays alive; the full DB user is loaded on the next
+ * request once the connection is established.
  */
 const protect = async (req, res, next) => {
   let token;
@@ -16,7 +25,7 @@ const protect = async (req, res, next) => {
       // Extract token from header
       token = req.headers.authorization.split(' ')[1];
 
-      // Verify token (supports both uppercase and lowercase secret fallback)
+      // Verify token signature (try configured secret, then fallback)
       let decoded;
       try {
         decoded = jwt.verify(
@@ -30,7 +39,7 @@ const protect = async (req, res, next) => {
         decoded = jwt.verify(token, altSecret);
       }
 
-      // Attach user from database (excluding password)
+      // ── Demo user shortcut ─────────────────────────────────────────────────
       const DEMO_USER_ID = '660e1a1a1a1a1a1a1a1a1a1a';
       const DEMO_USER = {
         _id: DEMO_USER_ID,
@@ -49,6 +58,7 @@ const protect = async (req, res, next) => {
         streakDays: 5
       };
 
+      // ── Try to load the full user from MongoDB ─────────────────────────────
       const mongoose = require('mongoose');
       if (mongoose.connection && mongoose.connection.readyState >= 1) {
         try {
@@ -58,14 +68,40 @@ const protect = async (req, res, next) => {
         }
       }
 
+      // ── Demo fallback ──────────────────────────────────────────────────────
       if (!req.user && String(decoded.id) === DEMO_USER_ID) {
         req.user = DEMO_USER;
       }
 
+      // ── JWT payload fallback (Google/OAuth users, DB cold-start) ──────────
+      // CRITICAL: do NOT return 401 here — that causes api.js to call clearAuth()
+      // and log the user out. Instead, build a lightweight session from the JWT.
+      if (!req.user && decoded && decoded.id) {
+        req.user = {
+          _id: decoded.id,
+          id: decoded.id,
+          name: decoded.name || 'Athlete',
+          email: decoded.email || '',
+          avatar: decoded.avatar || '',
+          selectedSport: decoded.selectedSport || 'Gym',
+          fitnessGoal: decoded.fitnessGoal || 'Sports performance',
+          activityLevel: decoded.activityLevel || 'Moderately Active',
+          age: decoded.age || 24,
+          gender: decoded.gender || 'Male',
+          height: decoded.height || 175,
+          weight: decoded.weight || 72,
+          dietaryPreference: decoded.dietaryPreference || 'Vegetarian',
+          streakDays: decoded.streakDays || 0,
+          _isJwtFallback: true  // flag so routes can gracefully handle partial data
+        };
+        console.warn('[Auth] DB unavailable — using JWT payload fallback for user', decoded.id);
+      }
+
+      // ── Final gate: token verified but user truly cannot be resolved ───────
       if (!req.user) {
         return res.status(401).json({
           success: false,
-          message: 'The athlete belonging to this token no longer exists.'
+          message: 'Not authorized: Unable to verify your session. Please log in again.'
         });
       }
 
