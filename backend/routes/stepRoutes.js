@@ -93,14 +93,29 @@ router.post('/log', protect, async (req, res) => {
     const distanceKm = Math.round(steps * 0.00075 * 100) / 100;
     const caloriesBurned = Math.round(steps * 0.04);
 
-    const record = await Step.create({
-      user: req.user._id,
-      date: logDate,
+    const record = await Step.findOneAndUpdate(
+  {
+    user: req.user._id,
+    date: {
+      $gte: new Date(logDate).setHours(0, 0, 0, 0),
+      $lt: new Date(logDate).setHours(24, 0, 0, 0)
+    },
+    source: 'Android Health Connect'
+  },
+  {
+    $set: {
       stepCount: steps,
-      source: 'Manual',
+      source: 'Android Health Connect',
       distanceKm,
       caloriesBurned
-    });
+    }
+  },
+  {
+    new: true,
+    upsert: true,
+    setDefaultsOnInsert: true
+  }
+);
 
     // Recompute totals
     const { todayStart, todayEnd, weekStart, weekEnd, monthStart, monthEnd } = getDateBoundaries();
